@@ -113,4 +113,85 @@ public class UsuarioServiceTest {
         
         verify(clienteRepository, times(1)).findByEmail("sinroles@example.com");
     }
+
+    @Test
+    void loadUserByUsername_ConRolesEspañoles_CargaCorrectamente() {
+        // Given
+        Role roleCliente = Role.builder()
+                .nombre("ROLE_CLIENTE")
+                .build();
+
+        Role roleGerente = Role.builder()
+                .nombre("ROLE_GERENTE")
+                .build();
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleCliente);
+        roles.add(roleGerente);
+
+        Cliente cliente = Cliente.builder()
+                .id(1L)
+                .nombre("Usuario")
+                .apellido("Español")
+                .email("espanol@example.com")
+                .contraseña("password123")
+                .roles(roles)
+                .build();
+
+        when(clienteRepository.findByEmail("espanol@example.com")).thenReturn(Optional.of(cliente));
+
+        // When
+        UserDetails userDetails = usuarioService.loadUserByUsername("espanol@example.com");
+
+        // Then
+        assertNotNull(userDetails);
+        assertEquals("espanol@example.com", userDetails.getUsername());
+        assertEquals(2, userDetails.getAuthorities().size());
+
+        // Verify Spanish role names are properly loaded
+        boolean hasClienteRole = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_CLIENTE"));
+        boolean hasGerenteRole = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_GERENTE"));
+
+        assertTrue(hasClienteRole);
+        assertTrue(hasGerenteRole);
+
+        verify(clienteRepository, times(1)).findByEmail("espanol@example.com");
+    }
+
+    @Test
+    void loadUserByUsername_ConRoleSinPrefijo_AgregaPrefijoROLE() {
+        // Given - Test role without ROLE_ prefix (edge case)
+        Role roleSinPrefijo = Role.builder()
+                .nombre("ADMIN") // Without ROLE_ prefix
+                .build();
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleSinPrefijo);
+
+        Cliente cliente = Cliente.builder()
+                .id(1L)
+                .nombre("Usuario")
+                .apellido("Test")
+                .email("test@example.com")
+                .contraseña("password123")
+                .roles(roles)
+                .build();
+
+        when(clienteRepository.findByEmail("test@example.com")).thenReturn(Optional.of(cliente));
+
+        // When
+        UserDetails userDetails = usuarioService.loadUserByUsername("test@example.com");
+
+        // Then
+        assertNotNull(userDetails);
+        assertEquals(1, userDetails.getAuthorities().size());
+
+        // Verify ROLE_ prefix is added
+        GrantedAuthority authority = userDetails.getAuthorities().iterator().next();
+        assertEquals("ROLE_ADMIN", authority.getAuthority());
+
+        verify(clienteRepository, times(1)).findByEmail("test@example.com");
+    }
 }

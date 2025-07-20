@@ -112,7 +112,7 @@ public class AuthController {
             gerente.setContraseña("gerente123");
 
             Set<String> roles = Set.of("ROLE_GERENTE");
-            Cliente registrado = clienteService.registrarClienteConRoles(gerente, roles);
+            clienteService.registrarClienteConRoles(gerente, roles);
 
             MessageResponse response = new MessageResponse();
             response.setMessage("Usuario gerente creado exitosamente");

@@ -216,6 +216,116 @@ class AuthControllerTest {
     }
 
     @Test
+    void testRegistrarUsuario_ConRolesEspecificos() {
+        // Given
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setNombre("Manager");
+        registerRequest.setApellido("User");
+        registerRequest.setEmail("manager@test.com");
+        registerRequest.setPassword("password123");
+        registerRequest.setRoles(java.util.Set.of("ROLE_GERENTE"));
+
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Manager");
+        cliente.setApellido("User");
+        cliente.setEmail("manager@test.com");
+
+        when(clienteService.registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class))).thenReturn(cliente);
+
+        // When
+        ResponseEntity<?> response = authController.registrarUsuario(registerRequest);
+
+        // Then
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(cliente, response.getBody());
+
+        verify(clienteService).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
+        verify(clienteService, never()).registrarCliente(any(Cliente.class));
+    }
+
+    @Test
+    void testRegistrarUsuario_ConRolesEspecificos_Exception() {
+        // Given
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setNombre("Manager");
+        registerRequest.setApellido("User");
+        registerRequest.setEmail("manager@test.com");
+        registerRequest.setPassword("password123");
+        registerRequest.setRoles(java.util.Set.of("ROLE_GERENTE"));
+
+        when(clienteService.registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class)))
+                .thenThrow(new RuntimeException("Role assignment failed"));
+
+        // When
+        ResponseEntity<?> response = authController.registrarUsuario(registerRequest);
+
+        // Then
+        assertEquals(500, response.getStatusCode().value());
+        assertTrue(response.getBody() instanceof MessageResponse);
+        MessageResponse messageResponse = (MessageResponse) response.getBody();
+        assertEquals("Error al registrar usuario: Role assignment failed", messageResponse.getMessage());
+
+        verify(clienteService).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
+        verify(clienteService, never()).registrarCliente(any(Cliente.class));
+    }
+
+    @Test
+    void testRegistrarUsuario_SinRoles_UsaRolPorDefecto() {
+        // Given
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setNombre("Cliente");
+        registerRequest.setApellido("User");
+        registerRequest.setEmail("cliente@test.com");
+        registerRequest.setPassword("password123");
+        // No roles specified
+
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Cliente");
+        cliente.setApellido("User");
+        cliente.setEmail("cliente@test.com");
+
+        when(clienteService.registrarCliente(any(Cliente.class))).thenReturn(cliente);
+
+        // When
+        ResponseEntity<?> response = authController.registrarUsuario(registerRequest);
+
+        // Then
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(cliente, response.getBody());
+
+        verify(clienteService).registrarCliente(any(Cliente.class));
+        verify(clienteService, never()).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
+    }
+
+    @Test
+    void testRegistrarUsuario_RolesVacios_UsaRolPorDefecto() {
+        // Given
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setNombre("Cliente");
+        registerRequest.setApellido("User");
+        registerRequest.setEmail("cliente@test.com");
+        registerRequest.setPassword("password123");
+        registerRequest.setRoles(java.util.Set.of()); // Empty roles
+
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Cliente");
+        cliente.setApellido("User");
+        cliente.setEmail("cliente@test.com");
+
+        when(clienteService.registrarCliente(any(Cliente.class))).thenReturn(cliente);
+
+        // When
+        ResponseEntity<?> response = authController.registrarUsuario(registerRequest);
+
+        // Then
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(cliente, response.getBody());
+
+        verify(clienteService).registrarCliente(any(Cliente.class));
+        verify(clienteService, never()).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
+    }
+
+    @Test
     void testValidacionToken_TokenValido() {
         String validToken = "valid.jwt.token";
         TokenRequest tokenRequest = new TokenRequest();
@@ -399,5 +509,73 @@ class AuthControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         verify(jwtUtil).validateJwtToken("valid-token");
+    }
+
+    @Test
+    void testCrearGerente_Success() {
+        // Given
+        Cliente gerente = new Cliente();
+        gerente.setNombre("Gerente");
+        gerente.setApellido("Usuario");
+        gerente.setEmail("gerente@letrasypapeles.com");
+
+        when(clienteService.obtenerPorEmail("gerente@letrasypapeles.com")).thenReturn(java.util.Optional.empty());
+        when(clienteService.registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class))).thenReturn(gerente);
+
+        // When
+        ResponseEntity<?> response = authController.crearGerente();
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof MessageResponse);
+        MessageResponse messageResponse = (MessageResponse) response.getBody();
+        assertEquals("Usuario gerente creado exitosamente", messageResponse.getMessage());
+
+        verify(clienteService).obtenerPorEmail("gerente@letrasypapeles.com");
+        verify(clienteService).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
+    }
+
+    @Test
+    void testCrearGerente_AlreadyExists() {
+        // Given
+        Cliente existingGerente = new Cliente();
+        existingGerente.setEmail("gerente@letrasypapeles.com");
+
+        when(clienteService.obtenerPorEmail("gerente@letrasypapeles.com")).thenReturn(java.util.Optional.of(existingGerente));
+
+        // When
+        ResponseEntity<?> response = authController.crearGerente();
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof MessageResponse);
+        MessageResponse messageResponse = (MessageResponse) response.getBody();
+        assertEquals("El usuario gerente ya existe", messageResponse.getMessage());
+
+        verify(clienteService).obtenerPorEmail("gerente@letrasypapeles.com");
+        verify(clienteService, never()).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
+    }
+
+    @Test
+    void testCrearGerente_Exception() {
+        // Given
+        when(clienteService.obtenerPorEmail("gerente@letrasypapeles.com")).thenReturn(java.util.Optional.empty());
+        when(clienteService.registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class)))
+                .thenThrow(new RuntimeException("Database error"));
+
+        // When
+        ResponseEntity<?> response = authController.crearGerente();
+
+        // Then
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody() instanceof MessageResponse);
+        MessageResponse messageResponse = (MessageResponse) response.getBody();
+        assertEquals("Error al crear gerente: Database error", messageResponse.getMessage());
+
+        verify(clienteService).obtenerPorEmail("gerente@letrasypapeles.com");
+        verify(clienteService).registrarClienteConRoles(any(Cliente.class), any(java.util.Set.class));
     }
 }

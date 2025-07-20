@@ -204,4 +204,50 @@ class DataInitializerTest {
         verify(reservaRepository, atLeastOnce()).save(any());
         verify(pedidoRepository, atLeastOnce()).save(any());
     }
+
+    @Test
+    void run_ShouldCreateSpanishRoles() throws Exception {
+        // Given
+        when(roleRepository.count()).thenReturn(0L);
+        when(roleRepository.findByNombre(anyString())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+
+        Role mockRole = new Role();
+        when(roleRepository.save(any(Role.class))).thenReturn(mockRole);
+
+        Cliente mockCliente = new Cliente();
+        mockCliente.setId(1L);
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(mockCliente);
+
+        // When
+        dataInitializer.run();
+
+        // Then - Verify Spanish role names are created
+        verify(roleRepository, times(3)).save(any(Role.class));
+        verify(roleRepository, atLeast(1)).findByNombre("ROLE_CLIENTE");
+        verify(roleRepository, atLeast(1)).findByNombre("ROLE_EMPLEADO");
+        verify(roleRepository, atLeast(1)).findByNombre("ROLE_GERENTE");
+    }
+
+    @Test
+    void run_ShouldCreateManagerAndEmployeeUsers() throws Exception {
+        // Given
+        when(roleRepository.count()).thenReturn(0L);
+        when(roleRepository.findByNombre(anyString())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+
+        Role mockRole = new Role();
+        when(roleRepository.save(any(Role.class))).thenReturn(mockRole);
+
+        Cliente mockCliente = new Cliente();
+        mockCliente.setId(1L);
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(mockCliente);
+
+        // When
+        dataInitializer.run();
+
+        // Then - Verify manager and employee users are created
+        verify(clienteRepository, atLeast(5)).save(any(Cliente.class)); // gerente, empleado, juan, ana, carlos
+        verify(passwordEncoder, atLeast(5)).encode(anyString());
+    }
 }

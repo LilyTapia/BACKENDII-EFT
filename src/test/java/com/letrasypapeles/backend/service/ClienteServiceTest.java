@@ -531,6 +531,165 @@ public class ClienteServiceTest {
         assertEquals(0, clienteInput.getPuntosFidelidad());
     }
 
+    @Test
+    void registrarClienteConRoles_ClienteNuevo_RegistraConRolesEspecificos() {
+        // Given
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Test");
+        cliente.setApellido("User");
+        cliente.setEmail("test@example.com");
+        cliente.setContraseña("password123");
+
+        Set<String> roleNames = Set.of("ROLE_GERENTE", "ROLE_EMPLEADO");
+
+        Role roleGerente = new Role();
+        roleGerente.setNombre("ROLE_GERENTE");
+        Role roleEmpleado = new Role();
+        roleEmpleado.setNombre("ROLE_EMPLEADO");
+
+        when(clienteRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(roleRepository.findByNombre("ROLE_GERENTE")).thenReturn(Optional.of(roleGerente));
+        when(roleRepository.findByNombre("ROLE_EMPLEADO")).thenReturn(Optional.of(roleEmpleado));
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
+
+        // When
+        Cliente resultado = clienteService.registrarClienteConRoles(cliente, roleNames);
+
+        // Then
+        assertNotNull(resultado);
+        assertEquals("encodedPassword", cliente.getContraseña());
+        assertEquals(0, cliente.getPuntosFidelidad());
+        assertEquals(2, cliente.getRoles().size());
+        assertTrue(cliente.getRoles().contains(roleGerente));
+        assertTrue(cliente.getRoles().contains(roleEmpleado));
+
+        verify(clienteRepository).existsByEmail("test@example.com");
+        verify(passwordEncoder).encode("password123");
+        verify(roleRepository).findByNombre("ROLE_GERENTE");
+        verify(roleRepository).findByNombre("ROLE_EMPLEADO");
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void registrarClienteConRoles_EmailYaExiste_LanzaExcepcion() {
+        // Given
+        Cliente cliente = new Cliente();
+        cliente.setEmail("existing@example.com");
+        Set<String> roleNames = Set.of("ROLE_CLIENTE");
+
+        when(clienteRepository.existsByEmail("existing@example.com")).thenReturn(true);
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            clienteService.registrarClienteConRoles(cliente, roleNames);
+        });
+
+        assertEquals("El correo electrónico ya está registrado.", exception.getMessage());
+        verify(clienteRepository).existsByEmail("existing@example.com");
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(clienteRepository, never()).save(any(Cliente.class));
+    }
+
+    @Test
+    void registrarClienteConRoles_RoleNoExiste_CreaRoleNuevo() {
+        // Given
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Test");
+        cliente.setApellido("User");
+        cliente.setEmail("test@example.com");
+        cliente.setContraseña("password123");
+
+        Set<String> roleNames = Set.of("ROLE_NUEVO");
+
+        Role roleNuevo = new Role();
+        roleNuevo.setNombre("ROLE_NUEVO");
+
+        when(clienteRepository.existsByEmail("test@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(roleRepository.findByNombre("ROLE_NUEVO")).thenReturn(Optional.empty());
+        when(roleRepository.save(any(Role.class))).thenReturn(roleNuevo);
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
+
+        // When
+        Cliente resultado = clienteService.registrarClienteConRoles(cliente, roleNames);
+
+        // Then
+        assertNotNull(resultado);
+        assertEquals(1, cliente.getRoles().size());
+        assertTrue(cliente.getRoles().contains(roleNuevo));
+
+        verify(roleRepository).findByNombre("ROLE_NUEVO");
+        verify(roleRepository).save(any(Role.class));
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void registrarClienteConRoles_MultipleRoles_RegistraCorrectamente() {
+        // Given
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Multi");
+        cliente.setApellido("Role");
+        cliente.setEmail("multi@example.com");
+        cliente.setContraseña("password123");
+
+        Set<String> roleNames = Set.of("ROLE_GERENTE", "ROLE_EMPLEADO", "ROLE_CLIENTE");
+
+        Role roleGerente = new Role();
+        roleGerente.setNombre("ROLE_GERENTE");
+        Role roleEmpleado = new Role();
+        roleEmpleado.setNombre("ROLE_EMPLEADO");
+        Role roleCliente = new Role();
+        roleCliente.setNombre("ROLE_CLIENTE");
+
+        when(clienteRepository.existsByEmail("multi@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(roleRepository.findByNombre("ROLE_GERENTE")).thenReturn(Optional.of(roleGerente));
+        when(roleRepository.findByNombre("ROLE_EMPLEADO")).thenReturn(Optional.of(roleEmpleado));
+        when(roleRepository.findByNombre("ROLE_CLIENTE")).thenReturn(Optional.of(roleCliente));
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
+
+        // When
+        Cliente resultado = clienteService.registrarClienteConRoles(cliente, roleNames);
+
+        // Then
+        assertNotNull(resultado);
+        assertEquals(3, cliente.getRoles().size());
+        assertTrue(cliente.getRoles().contains(roleGerente));
+        assertTrue(cliente.getRoles().contains(roleEmpleado));
+        assertTrue(cliente.getRoles().contains(roleCliente));
+
+        verify(roleRepository).findByNombre("ROLE_GERENTE");
+        verify(roleRepository).findByNombre("ROLE_EMPLEADO");
+        verify(roleRepository).findByNombre("ROLE_CLIENTE");
+    }
+
+    @Test
+    void registrarClienteConRoles_EmptyRoleSet_NoAsignaRoles() {
+        // Given
+        Cliente cliente = new Cliente();
+        cliente.setNombre("No");
+        cliente.setApellido("Roles");
+        cliente.setEmail("noroles@example.com");
+        cliente.setContraseña("password123");
+
+        Set<String> roleNames = Set.of(); // Empty set
+
+        when(clienteRepository.existsByEmail("noroles@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
+
+        // When
+        Cliente resultado = clienteService.registrarClienteConRoles(cliente, roleNames);
+
+        // Then
+        assertNotNull(resultado);
+        assertEquals(0, cliente.getRoles().size());
+
+        verify(roleRepository, never()).findByNombre(anyString());
+        verify(roleRepository, never()).save(any(Role.class));
+    }
+
     // Missing exception tests for 100% coverage
 
     @Test
