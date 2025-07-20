@@ -57,7 +57,7 @@ class InventarioControllerTest {
 
         ResponseEntity<List<Inventario>> response = inventarioController.obtenerTodos();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -67,7 +67,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Inventario> response = inventarioController.obtenerPorId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(100, response.getBody().getCantidad());
     }
 
@@ -77,7 +77,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Inventario> response = inventarioController.obtenerPorId(1L);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -87,7 +87,7 @@ class InventarioControllerTest {
 
         ResponseEntity<List<Inventario>> response = inventarioController.obtenerPorProductoId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -98,7 +98,7 @@ class InventarioControllerTest {
 
         ResponseEntity<List<Inventario>> response = inventarioController.obtenerPorSucursalId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -108,7 +108,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Inventario> response = inventarioController.crearInventario(inventario);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(100, response.getBody().getCantidad());
     }
 
@@ -119,7 +119,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Inventario> response = inventarioController.actualizarInventario(1L, inventario);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(100, response.getBody().getCantidad());
     }
 
@@ -129,7 +129,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Inventario> response = inventarioController.actualizarInventario(1L, inventario);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -139,7 +139,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Void> response = inventarioController.eliminarInventario(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -148,7 +148,7 @@ class InventarioControllerTest {
 
         ResponseEntity<Void> response = inventarioController.eliminarInventario(1L);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     // Tests for singular endpoints to achieve 100% coverage

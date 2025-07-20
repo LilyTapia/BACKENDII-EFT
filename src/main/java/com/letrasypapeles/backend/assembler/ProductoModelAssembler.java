@@ -5,6 +5,7 @@ import com.letrasypapeles.backend.controller.CategoriaController;
 import com.letrasypapeles.backend.entity.Producto;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -13,7 +14,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class ProductoModelAssembler implements RepresentationModelAssembler<Producto, EntityModel<Producto>> {
 
     @Override
-    public EntityModel<Producto> toModel(Producto producto) {
+    @NonNull
+    public EntityModel<Producto> toModel(@NonNull Producto producto) {
         EntityModel<Producto> productoModel = EntityModel.of(producto);
 
         // Self link

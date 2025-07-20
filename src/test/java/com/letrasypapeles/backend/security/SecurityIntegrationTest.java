@@ -50,9 +50,6 @@ class SecurityIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
     private Cliente clienteTest;
     private Role roleCliente;
     private Role roleAdmin;

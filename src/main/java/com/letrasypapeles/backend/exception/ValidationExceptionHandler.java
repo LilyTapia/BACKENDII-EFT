@@ -3,6 +3,7 @@ package com.letrasypapeles.backend.exception;
 import com.letrasypapeles.backend.dto.MessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,9 +16,9 @@ public class ValidationExceptionHandler {
         MessageResponse response = new MessageResponse();
         
         String errorMessage = "Datos de entrada inválidos";
-        if (ex.getBindingResult().getFieldError() != null && 
-            ex.getBindingResult().getFieldError().getDefaultMessage() != null) {
-            errorMessage = ex.getBindingResult().getFieldError().getDefaultMessage();
+        FieldError fieldError = ex.getBindingResult().getFieldError();
+        if (fieldError != null && fieldError.getDefaultMessage() != null) {
+            errorMessage = fieldError.getDefaultMessage();
         }
         
         response.setMessage(errorMessage);

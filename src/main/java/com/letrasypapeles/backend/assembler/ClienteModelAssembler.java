@@ -6,6 +6,7 @@ import com.letrasypapeles.backend.controller.ReservaController;
 import com.letrasypapeles.backend.entity.Cliente;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -14,7 +15,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class ClienteModelAssembler implements RepresentationModelAssembler<Cliente, EntityModel<Cliente>> {
 
     @Override
-    public EntityModel<Cliente> toModel(Cliente cliente) {
+    @NonNull
+    public EntityModel<Cliente> toModel(@NonNull Cliente cliente) {
         EntityModel<Cliente> clienteModel = EntityModel.of(cliente);
 
         // Self link

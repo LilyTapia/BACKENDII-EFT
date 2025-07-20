@@ -2,6 +2,7 @@ package com.letrasypapeles.backend.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.letrasypapeles.backend.dto.LoginRequest;
 import com.letrasypapeles.backend.entity.*;
 import com.letrasypapeles.backend.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,12 +49,6 @@ public class HateoasIntegrationTest {
     private CategoriaRepository categoriaRepository;
 
     @Autowired
-    private PedidoRepository pedidoRepository;
-
-    @Autowired
-    private ReservaRepository reservaRepository;
-
-    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -63,11 +57,10 @@ public class HateoasIntegrationTest {
     private Cliente cliente;
     private Producto producto;
     private Categoria categoria;
-    private Pedido pedido;
-    private Reserva reserva;
+    private String jwtToken;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         // Create test role if it doesn't exist
         Role clienteRole = roleRepository.findById("ROLE_CLIENTE")
                 .orElseGet(() -> {
@@ -79,8 +72,8 @@ public class HateoasIntegrationTest {
 
         // Create test category
         categoria = Categoria.builder()
-                .nombre("Papelería")
-                .descripcion("Productos de papelería")
+                .nombre("Papeleria")
+                .descripcion("Productos de papeleria")
                 .build();
         categoria = categoriaRepository.save(categoria);
 
@@ -97,21 +90,40 @@ public class HateoasIntegrationTest {
         // Create test client
         cliente = Cliente.builder()
                 .nombre("Juan")
-                .apellido("Pérez")
+                .apellido("Perez")
                 .email("juan@test.com")
                 .contraseña(passwordEncoder.encode("password"))
                 .puntosFidelidad(0)
                 .roles(Set.of(clienteRole))
                 .build();
         cliente = clienteRepository.save(cliente);
+
+        // Obtain JWT token for authentication
+        jwtToken = obtenerTokenJWT("juan@test.com", "password");
+    }
+
+    private String obtenerTokenJWT(String email, String password) throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail(email);
+        loginRequest.setPassword(password);
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        return objectMapper.readTree(responseBody).get("token").asText();
     }
 
     @Test
     void testProductoHateoasLinks() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/productos/{id}", producto.getId())
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType("application/hal+json"))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -147,9 +159,10 @@ public class HateoasIntegrationTest {
     @Test
     void testClienteHateoasLinks() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/clientes/{id}", cliente.getId())
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType("application/hal+json"))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -157,7 +170,7 @@ public class HateoasIntegrationTest {
 
         // Verify client data
         assertEquals("Juan", jsonNode.get("nombre").asText());
-        assertEquals("Pérez", jsonNode.get("apellido").asText());
+        assertEquals("Perez", jsonNode.get("apellido").asText());
 
         // Verify HATEOAS links
         JsonNode links = jsonNode.get("_links");
@@ -183,16 +196,17 @@ public class HateoasIntegrationTest {
     @Test
     void testCategoriaHateoasLinks() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/categorias/{id}", categoria.getId())
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType("application/hal+json"))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
         JsonNode jsonNode = objectMapper.readTree(content);
 
         // Verify category data
-        assertEquals("Papelería", jsonNode.get("nombre").asText());
+        assertEquals("Papeleria", jsonNode.get("nombre").asText());
 
         // Verify HATEOAS links
         JsonNode links = jsonNode.get("_links");
@@ -214,9 +228,10 @@ public class HateoasIntegrationTest {
     @Test
     void testProductosCollectionHateoasLinks() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/productos")
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType("application/hal+json"))
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
@@ -247,18 +262,20 @@ public class HateoasIntegrationTest {
     void testNavigationBetweenResources() throws Exception {
         // Get product
         MvcResult productResult = mockMvc.perform(get("/api/productos/{id}", producto.getId())
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String productContent = productResult.getResponse().getContentAsString();
         JsonNode productNode = objectMapper.readTree(productContent);
-        
+
         // Extract category link from product
         String categoryHref = productNode.get("_links").get("categoria").get("href").asText();
-        
+
         // Navigate to category using the link
         MvcResult categoryResult = mockMvc.perform(get(categoryHref)
+                .header("Authorization", "Bearer " + jwtToken)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -268,6 +285,6 @@ public class HateoasIntegrationTest {
         
         // Verify we got the correct category
         assertEquals(categoria.getId().toString(), categoryNode.get("id").asText());
-        assertEquals("Papelería", categoryNode.get("nombre").asText());
+        assertEquals("Papeleria", categoryNode.get("nombre").asText());
     }
 }

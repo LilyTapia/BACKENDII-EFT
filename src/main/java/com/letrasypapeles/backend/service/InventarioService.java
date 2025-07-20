@@ -2,7 +2,7 @@ package com.letrasypapeles.backend.service;
 
 import com.letrasypapeles.backend.entity.Inventario;
 import com.letrasypapeles.backend.repository.InventarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +12,11 @@ import java.util.stream.Collectors;
 @Service
 public class InventarioService {
 
-    @Autowired
-    private InventarioRepository inventarioRepository;
+    private final InventarioRepository inventarioRepository;
+
+    public InventarioService(InventarioRepository inventarioRepository) {
+        this.inventarioRepository = inventarioRepository;
+    }
 
     public List<Inventario> obtenerTodos() {
         return inventarioRepository.findAll();

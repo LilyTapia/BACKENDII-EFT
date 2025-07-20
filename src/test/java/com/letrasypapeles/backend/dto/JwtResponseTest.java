@@ -254,7 +254,7 @@ class JwtResponseTest {
     @Test
     void equals_DifferentClass_ReturnsFalse() {
         // Given
-        String otherObject = "Not a JwtResponse";
+        Object otherObject = "Not a JwtResponse";
 
         // When & Then
         assertFalse(jwtResponse.equals(otherObject));

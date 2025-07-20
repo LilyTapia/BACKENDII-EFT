@@ -7,7 +7,7 @@ import com.letrasypapeles.backend.entity.Cliente;
 import com.letrasypapeles.backend.repository.ReservaRepository;
 import com.letrasypapeles.backend.repository.ProductoRepository;
 import com.letrasypapeles.backend.repository.ClienteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,14 +17,17 @@ import java.util.Optional;
 @Service
 public class ReservaService {
 
-    @Autowired
-    private ReservaRepository reservaRepository;
+    private final ReservaRepository reservaRepository;
+    private final ProductoRepository productoRepository;
+    private final ClienteRepository clienteRepository;
 
-    @Autowired
-    private ProductoRepository productoRepository;
-
-    @Autowired
-    private ClienteRepository clienteRepository;
+    public ReservaService(ReservaRepository reservaRepository,
+                         ProductoRepository productoRepository,
+                         ClienteRepository clienteRepository) {
+        this.reservaRepository = reservaRepository;
+        this.productoRepository = productoRepository;
+        this.clienteRepository = clienteRepository;
+    }
 
     public List<Reserva> obtenerTodas() {
         return reservaRepository.findAll();

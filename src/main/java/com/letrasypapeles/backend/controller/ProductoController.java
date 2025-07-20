@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +25,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RequestMapping("/api/productos")
 public class ProductoController {
 
-    @Autowired
-    private ProductoService productoService;
+    private final ProductoService productoService;
+    private final ProductoModelAssembler productoModelAssembler;
 
-    @Autowired
-    private ProductoModelAssembler productoModelAssembler;
+    public ProductoController(ProductoService productoService, ProductoModelAssembler productoModelAssembler) {
+        this.productoService = productoService;
+        this.productoModelAssembler = productoModelAssembler;
+    }
 
     @Operation(summary = "Obtener todos los productos")
     @ApiResponses(value = {

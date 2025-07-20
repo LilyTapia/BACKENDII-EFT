@@ -6,6 +6,7 @@ import com.letrasypapeles.backend.controller.ProductoController;
 import com.letrasypapeles.backend.entity.Reserva;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -14,7 +15,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class ReservaModelAssembler implements RepresentationModelAssembler<Reserva, EntityModel<Reserva>> {
 
     @Override
-    public EntityModel<Reserva> toModel(Reserva reserva) {
+    @NonNull
+    public EntityModel<Reserva> toModel(@NonNull Reserva reserva) {
         EntityModel<Reserva> reservaModel = EntityModel.of(reserva);
 
         // Self link

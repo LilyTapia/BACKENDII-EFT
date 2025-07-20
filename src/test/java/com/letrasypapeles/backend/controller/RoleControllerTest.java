@@ -41,7 +41,7 @@ class RoleControllerTest {
 
         ResponseEntity<List<Role>> response = roleController.obtenerTodos();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -51,7 +51,7 @@ class RoleControllerTest {
 
         ResponseEntity<Role> response = roleController.obtenerPorNombre("CLIENTE");
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("CLIENTE", response.getBody().getNombre());
     }
 
@@ -61,7 +61,7 @@ class RoleControllerTest {
 
         ResponseEntity<Role> response = roleController.obtenerPorNombre("ADMIN");
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -70,7 +70,7 @@ class RoleControllerTest {
 
         ResponseEntity<Role> response = roleController.crearRole(role);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("CLIENTE", response.getBody().getNombre());
     }
 
@@ -81,7 +81,7 @@ class RoleControllerTest {
 
         ResponseEntity<Void> response = roleController.eliminarRole("CLIENTE");
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -90,6 +90,6 @@ class RoleControllerTest {
 
         ResponseEntity<Void> response = roleController.eliminarRole("ADMIN");
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 }

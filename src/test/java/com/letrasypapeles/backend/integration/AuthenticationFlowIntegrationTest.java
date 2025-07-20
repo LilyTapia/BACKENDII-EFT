@@ -84,13 +84,12 @@ class AuthenticationFlowIntegrationTest {
         registerRequest.setEmail("test@example.com");
         registerRequest.setPassword("password123");
 
-        MvcResult registroResult = mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value("Test"))
-                .andExpect(jsonPath("$.email").value("test@example.com"))
-                .andReturn();
+                .andExpect(jsonPath("$.email").value("test@example.com"));
 
         // Verificar que el usuario se creó en la base de datos
         Cliente usuarioCreado = clienteRepository.findByEmail("test@example.com").orElse(null);

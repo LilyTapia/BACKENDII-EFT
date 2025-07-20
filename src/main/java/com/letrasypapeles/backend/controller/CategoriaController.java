@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +23,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Tag(name = "Categorías", description = "Operaciones para gestionar categorías de productos")
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaService categoriaService;
+    private final CategoriaService categoriaService;
+    private final CategoriaModelAssembler categoriaModelAssembler;
 
-    @Autowired
-    private CategoriaModelAssembler categoriaModelAssembler;
+    public CategoriaController(CategoriaService categoriaService, CategoriaModelAssembler categoriaModelAssembler) {
+        this.categoriaService = categoriaService;
+        this.categoriaModelAssembler = categoriaModelAssembler;
+    }
 
     @GetMapping
     @Operation(summary = "Obtiene todas las categorías", description = "Devuelve la lista completa de categorías registradas")

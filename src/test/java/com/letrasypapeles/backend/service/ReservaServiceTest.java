@@ -1,5 +1,6 @@
 package com.letrasypapeles.backend.service;
 
+import com.letrasypapeles.backend.dto.ReservaRequest;
 import com.letrasypapeles.backend.entity.Cliente;
 import com.letrasypapeles.backend.entity.Producto;
 import com.letrasypapeles.backend.entity.Reserva;
@@ -673,5 +674,339 @@ public class ReservaServiceTest {
         verify(reservaRepository).findById(reservaId);
         verify(reservaRepository, never()).save(any(Reserva.class));
         verify(productoRepository, never()).save(any(Producto.class));
+    }
+
+    @Test
+    void crearDesdeReservaRequest() {
+        // Given
+        LocalDateTime fechaRequest = LocalDateTime.now();
+        ReservaRequest reservaRequest = ReservaRequest.builder()
+                .clienteId(1L)
+                .productoId(1L)
+                .cantidad(3)
+                .estado("CONFIRMADA")
+                .fechaReserva(fechaRequest)
+                .build();
+
+        Reserva reservaCreada = Reserva.builder()
+                .id(1L)
+                .cliente(cliente)
+                .producto(producto)
+                .cantidad(3)
+                .estado("CONFIRMADA")
+                .fechaReserva(fechaRequest)
+                .build();
+
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaCreada);
+
+        // When
+        Reserva result = reservaService.crearDesdeReservaRequest(reservaRequest);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals(cliente, result.getCliente());
+        assertEquals(producto, result.getProducto());
+        assertEquals(3, result.getCantidad());
+        assertEquals("CONFIRMADA", result.getEstado());
+        assertEquals(fechaRequest, result.getFechaReserva());
+        verify(clienteRepository, times(1)).findById(1L);
+        verify(productoRepository, times(1)).findById(1L);
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void crearDesdeReservaRequestConClienteNoEncontrado() {
+        // Given
+        ReservaRequest reservaRequest = ReservaRequest.builder()
+                .clienteId(99L)
+                .productoId(1L)
+                .cantidad(1)
+                .build();
+
+        when(clienteRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            reservaService.crearDesdeReservaRequest(reservaRequest);
+        });
+
+        assertEquals("Cliente no encontrado con ID: 99", exception.getMessage());
+        verify(clienteRepository, times(1)).findById(99L);
+        verify(productoRepository, never()).findById(any(Long.class));
+        verify(reservaRepository, never()).save(any(Reserva.class));
+    }
+
+    @Test
+    void crearDesdeReservaRequestConProductoNoEncontrado() {
+        // Given
+        ReservaRequest reservaRequest = ReservaRequest.builder()
+                .clienteId(1L)
+                .productoId(99L)
+                .cantidad(1)
+                .build();
+
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(productoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            reservaService.crearDesdeReservaRequest(reservaRequest);
+        });
+
+        assertEquals("Producto no encontrado con ID: 99", exception.getMessage());
+        verify(clienteRepository, times(1)).findById(1L);
+        verify(productoRepository, times(1)).findById(99L);
+        verify(reservaRepository, never()).save(any(Reserva.class));
+    }
+
+    @Test
+    void crearDesdeReservaRequestConValoresPorDefecto() {
+        // Given
+        ReservaRequest reservaRequest = ReservaRequest.builder()
+                .clienteId(1L)
+                .productoId(1L)
+                .cantidad(null) // Sin cantidad
+                .estado(null) // Sin estado
+                .fechaReserva(null) // Sin fecha
+                .build();
+
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(reservaRepository.save(any(Reserva.class))).thenAnswer(invocation -> {
+            Reserva reservaArgument = invocation.getArgument(0);
+            return Reserva.builder()
+                    .id(1L)
+                    .cliente(reservaArgument.getCliente())
+                    .producto(reservaArgument.getProducto())
+                    .cantidad(reservaArgument.getCantidad())
+                    .estado(reservaArgument.getEstado())
+                    .fechaReserva(reservaArgument.getFechaReserva())
+                    .build();
+        });
+
+        // When
+        Reserva result = reservaService.crearDesdeReservaRequest(reservaRequest);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(cliente, result.getCliente());
+        assertEquals(producto, result.getProducto());
+        assertEquals(1, result.getCantidad()); // Valor por defecto
+        assertEquals("PENDIENTE", result.getEstado()); // Valor por defecto
+        assertNotNull(result.getFechaReserva()); // Fecha asignada automáticamente
+        verify(clienteRepository, times(1)).findById(1L);
+        verify(productoRepository, times(1)).findById(1L);
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarConClienteIncompleto() {
+        // Given
+        Cliente clienteIncompleto = Cliente.builder()
+                .id(1L)
+                .build(); // Solo ID, sin nombre ni email
+
+        Cliente clienteCompleto = Cliente.builder()
+                .id(1L)
+                .nombre("Test")
+                .apellido("Usuario")
+                .email("test@example.com")
+                .build();
+
+        Reserva reservaConClienteIncompleto = Reserva.builder()
+                .cliente(clienteIncompleto)
+                .producto(producto)
+                .cantidad(1)
+                .build();
+
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(clienteCompleto));
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaConClienteIncompleto);
+
+        // When
+        Reserva result = reservaService.guardar(reservaConClienteIncompleto);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(clienteCompleto, result.getCliente());
+        verify(clienteRepository, times(1)).findById(1L);
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarConClienteIncompletoNoEncontrado() {
+        // Given
+        Cliente clienteIncompleto = Cliente.builder()
+                .id(99L)
+                .build(); // Solo ID, sin nombre ni email
+
+        Reserva reservaConClienteIncompleto = Reserva.builder()
+                .cliente(clienteIncompleto)
+                .producto(producto)
+                .cantidad(1)
+                .build();
+
+        when(clienteRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            reservaService.guardar(reservaConClienteIncompleto);
+        });
+
+        assertEquals("Cliente no encontrado con ID: 99", exception.getMessage());
+        verify(clienteRepository, times(1)).findById(99L);
+        verify(reservaRepository, never()).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarConProductoIncompleto() {
+        // Given
+        Producto productoIncompleto = Producto.builder()
+                .id(1L)
+                .build(); // Solo ID, sin nombre ni precio
+
+        Producto productoCompleto = Producto.builder()
+                .id(1L)
+                .nombre("El Quijote")
+                .precio(new BigDecimal("25.99"))
+                .stock(10)
+                .build();
+
+        Reserva reservaConProductoIncompleto = Reserva.builder()
+                .cliente(cliente)
+                .producto(productoIncompleto)
+                .cantidad(1)
+                .build();
+
+        when(productoRepository.findById(1L)).thenReturn(Optional.of(productoCompleto));
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaConProductoIncompleto);
+
+        // When
+        Reserva result = reservaService.guardar(reservaConProductoIncompleto);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(productoCompleto, result.getProducto());
+        verify(productoRepository, times(1)).findById(1L);
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarConProductoIncompletoNoEncontrado() {
+        // Given
+        Producto productoIncompleto = Producto.builder()
+                .id(99L)
+                .build(); // Solo ID, sin nombre ni precio
+
+        Reserva reservaConProductoIncompleto = Reserva.builder()
+                .cliente(cliente)
+                .producto(productoIncompleto)
+                .cantidad(1)
+                .build();
+
+        when(productoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // When & Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            reservaService.guardar(reservaConProductoIncompleto);
+        });
+
+        assertEquals("Producto no encontrado con ID: 99", exception.getMessage());
+        verify(productoRepository, times(1)).findById(99L);
+        verify(reservaRepository, never()).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarConProductoCompleto() {
+        // Given
+        Producto productoCompleto = Producto.builder()
+                .id(1L)
+                .nombre("El Quijote")
+                .precio(new BigDecimal("25.99"))
+                .stock(10)
+                .build();
+
+        Reserva reservaConProductoCompleto = Reserva.builder()
+                .cliente(cliente)
+                .producto(productoCompleto)
+                .cantidad(1)
+                .build();
+
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaConProductoCompleto);
+
+        // When
+        Reserva result = reservaService.guardar(reservaConProductoCompleto);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(productoCompleto, result.getProducto());
+        verify(productoRepository, never()).findById(any(Long.class)); // No debe buscar productos completos
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarSinFechaReserva() {
+        // Given
+        Reserva reservaSinFecha = Reserva.builder()
+                .cliente(cliente)
+                .producto(producto)
+                .cantidad(1)
+                .estado("PENDIENTE")
+                .build(); // Sin fecha
+
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaSinFecha);
+
+        // When
+        Reserva result = reservaService.guardar(reservaSinFecha);
+
+        // Then
+        assertNotNull(result);
+        assertNotNull(result.getFechaReserva()); // Debe tener fecha asignada
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarSinEstado() {
+        // Given
+        Reserva reservaSinEstado = Reserva.builder()
+                .cliente(cliente)
+                .producto(producto)
+                .cantidad(1)
+                .fechaReserva(LocalDateTime.now())
+                .build(); // Sin estado
+
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaSinEstado);
+
+        // When
+        Reserva result = reservaService.guardar(reservaSinEstado);
+
+        // Then
+        assertNotNull(result);
+        assertEquals("PENDIENTE", result.getEstado()); // Debe tener estado por defecto
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
+    }
+
+    @Test
+    void guardarConEstadoVacio() {
+        // Given
+        Reserva reservaConEstadoVacio = Reserva.builder()
+                .cliente(cliente)
+                .producto(producto)
+                .cantidad(1)
+                .fechaReserva(LocalDateTime.now())
+                .estado("   ") // Estado vacío
+                .build();
+
+        when(reservaRepository.save(any(Reserva.class))).thenReturn(reservaConEstadoVacio);
+
+        // When
+        Reserva result = reservaService.guardar(reservaConEstadoVacio);
+
+        // Then
+        assertNotNull(result);
+        assertEquals("PENDIENTE", result.getEstado()); // Debe tener estado por defecto
+        verify(reservaRepository, times(1)).save(any(Reserva.class));
     }
 }

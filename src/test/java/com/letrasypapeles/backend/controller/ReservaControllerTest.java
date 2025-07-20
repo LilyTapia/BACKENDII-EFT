@@ -10,6 +10,7 @@ import com.letrasypapeles.backend.service.ClienteService;
 import com.letrasypapeles.backend.service.ProductoService;
 import com.letrasypapeles.backend.service.InventarioService;
 import com.letrasypapeles.backend.repository.ClienteRepository;
+import com.letrasypapeles.backend.dto.ReservaRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -104,7 +106,7 @@ class ReservaControllerTest {
 
         ResponseEntity<List<Reserva>> response = reservaController.obtenerPorClienteId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -258,7 +260,7 @@ class ReservaControllerTest {
 
         ResponseEntity<Reserva> response = reservaController.actualizarReserva(1L, reserva);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -267,7 +269,7 @@ class ReservaControllerTest {
 
         ResponseEntity<Reserva> response = reservaController.actualizarReserva(1L, reserva);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -277,7 +279,7 @@ class ReservaControllerTest {
 
         ResponseEntity<Void> response = reservaController.eliminarReserva(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -286,7 +288,7 @@ class ReservaControllerTest {
 
         ResponseEntity<Void> response = reservaController.eliminarReserva(1L);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -695,5 +697,79 @@ class ReservaControllerTest {
 
         // Then
         assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testCrearReservaConIds() throws Exception {
+        // Given
+        Cliente testCliente = Cliente.builder()
+                .id(1L)
+                .nombre("Test")
+                .apellido("Cliente")
+                .email("test@example.com")
+                .build();
+
+        Producto testProducto = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .precio(new BigDecimal("10.00"))
+                .stock(5)
+                .build();
+
+        ReservaRequest reservaRequest = ReservaRequest.builder()
+                .clienteId(1L)
+                .productoId(1L)
+                .cantidad(2)
+                .estado("PENDIENTE")
+                .build();
+
+        Reserva nuevaReserva = Reserva.builder()
+                .id(1L)
+                .cliente(testCliente)
+                .producto(testProducto)
+                .cantidad(2)
+                .estado("PENDIENTE")
+                .fechaReserva(LocalDateTime.now())
+                .build();
+
+        EntityModel<Reserva> reservaModel = EntityModel.of(nuevaReserva);
+
+        when(reservaService.crearDesdeReservaRequest(any(ReservaRequest.class))).thenReturn(nuevaReserva);
+        when(reservaModelAssembler.toModel(any(Reserva.class))).thenReturn(reservaModel);
+
+        // When
+        ResponseEntity<EntityModel<Reserva>> response = reservaController.crearReservaConIds(reservaRequest);
+
+        // Then
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getContent().getId());
+        assertEquals(2, response.getBody().getContent().getCantidad());
+        assertEquals("PENDIENTE", response.getBody().getContent().getEstado());
+
+        verify(reservaService, times(1)).crearDesdeReservaRequest(any(ReservaRequest.class));
+        verify(reservaModelAssembler, times(1)).toModel(any(Reserva.class));
+    }
+
+    @Test
+    void testCrearReservaConIds_Exception() throws Exception {
+        // Given
+        ReservaRequest reservaRequest = ReservaRequest.builder()
+                .clienteId(1L)
+                .productoId(1L)
+                .cantidad(2)
+                .build();
+
+        when(reservaService.crearDesdeReservaRequest(any(ReservaRequest.class)))
+                .thenThrow(new RuntimeException("Error al crear reserva"));
+
+        // When
+        ResponseEntity<EntityModel<Reserva>> response = reservaController.crearReservaConIds(reservaRequest);
+
+        // Then
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+        verify(reservaService, times(1)).crearDesdeReservaRequest(any(ReservaRequest.class));
+        verify(reservaModelAssembler, never()).toModel(any(Reserva.class));
     }
 }

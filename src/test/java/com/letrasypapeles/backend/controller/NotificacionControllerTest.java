@@ -44,7 +44,7 @@ class NotificacionControllerTest {
 
         ResponseEntity<List<Notificacion>> response = notificacionController.obtenerTodas();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -54,7 +54,7 @@ class NotificacionControllerTest {
 
         ResponseEntity<Notificacion> response = notificacionController.obtenerPorId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("Test mensaje", response.getBody().getMensaje());
     }
 
@@ -64,7 +64,7 @@ class NotificacionControllerTest {
 
         ResponseEntity<Notificacion> response = notificacionController.obtenerPorId(1L);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -74,7 +74,7 @@ class NotificacionControllerTest {
 
         ResponseEntity<List<Notificacion>> response = notificacionController.obtenerPorClienteId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
     }
 
@@ -84,7 +84,7 @@ class NotificacionControllerTest {
 
         ResponseEntity<Notificacion> response = notificacionController.crearNotificacion(notificacion);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody().getFecha());
     }
 
@@ -95,7 +95,7 @@ class NotificacionControllerTest {
 
         ResponseEntity<Void> response = notificacionController.eliminarNotificacion(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -104,6 +104,6 @@ class NotificacionControllerTest {
 
         ResponseEntity<Void> response = notificacionController.eliminarNotificacion(1L);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 }

@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +25,13 @@ import java.util.stream.Collectors;
 @Tag(name = "Administración", description = "Operaciones administrativas de usuarios y roles")
 public class AdminController {
 
-    @Autowired
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
+    private final RoleService roleService;
 
-    @Autowired
-    private RoleService roleService;
+    public AdminController(ClienteService clienteService, RoleService roleService) {
+        this.clienteService = clienteService;
+        this.roleService = roleService;
+    }
 
     @GetMapping("/usuarios")
     @Operation(summary = "Obtiene todos los usuarios", description = "Devuelve la lista completa de clientes registrados en el sistema")

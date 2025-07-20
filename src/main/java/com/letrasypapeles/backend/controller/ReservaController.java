@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -37,23 +37,26 @@ import java.time.LocalDateTime;
 @Tag(name = "Reservas", description = "Operaciones para gestionar reservas")
 public class ReservaController {
 
-    @Autowired
-    private ReservaService reservaService;
+    private final ReservaService reservaService;
+    private final ClienteService clienteService;
+    private final ProductoService productoService;
+    private final InventarioService inventarioService;
+    private final ClienteRepository clienteRepository;
+    private final ReservaModelAssembler reservaModelAssembler;
 
-    @Autowired
-    private ClienteService clienteService;
-
-    @Autowired
-    private ProductoService productoService;
-
-    @Autowired
-    private InventarioService inventarioService;
-
-    @Autowired
-    private ClienteRepository clienteRepository;
-
-    @Autowired
-    private ReservaModelAssembler reservaModelAssembler;
+    public ReservaController(ReservaService reservaService,
+                           ClienteService clienteService,
+                           ProductoService productoService,
+                           InventarioService inventarioService,
+                           ClienteRepository clienteRepository,
+                           ReservaModelAssembler reservaModelAssembler) {
+        this.reservaService = reservaService;
+        this.clienteService = clienteService;
+        this.productoService = productoService;
+        this.inventarioService = inventarioService;
+        this.clienteRepository = clienteRepository;
+        this.reservaModelAssembler = reservaModelAssembler;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('CLIENTE') or hasRole('VENDEDOR')")
@@ -99,6 +102,7 @@ public class ReservaController {
         @ApiResponse(responseCode = "400", description = "Solicitud inválida o stock insuficiente"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
+    @SuppressWarnings("unchecked")
     public ResponseEntity<?> crearReserva(
             @Parameter(description = "Cuerpo de la solicitud con clienteId, productoId, cantidad y opcional fechaReserva", required = true)
             @RequestBody Map<String, Object> requestBody) {

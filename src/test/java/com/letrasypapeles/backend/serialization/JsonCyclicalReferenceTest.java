@@ -5,12 +5,14 @@ import com.letrasypapeles.backend.entity.Cliente;
 import com.letrasypapeles.backend.entity.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class JsonCyclicalReferenceTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

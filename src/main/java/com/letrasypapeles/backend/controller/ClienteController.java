@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +25,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @Tag(name = "Clientes", description = "Operaciones para gestionar clientes")
 public class ClienteController {
 
-    @Autowired
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
+    private final ClienteModelAssembler clienteModelAssembler;
 
-    @Autowired
-    private ClienteModelAssembler clienteModelAssembler;
+    public ClienteController(ClienteService clienteService, ClienteModelAssembler clienteModelAssembler) {
+        this.clienteService = clienteService;
+        this.clienteModelAssembler = clienteModelAssembler;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")

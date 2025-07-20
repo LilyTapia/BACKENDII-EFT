@@ -4,7 +4,7 @@ import com.letrasypapeles.backend.entity.Cliente;
 import com.letrasypapeles.backend.entity.Role;
 import com.letrasypapeles.backend.repository.ClienteRepository;
 import com.letrasypapeles.backend.repository.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,17 @@ import java.util.*;
 @Service
 public class ClienteService {
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public ClienteService(ClienteRepository clienteRepository,
+                         RoleRepository roleRepository,
+                         PasswordEncoder passwordEncoder) {
+        this.clienteRepository = clienteRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public List<Cliente> obtenerTodos() {
         return clienteRepository.findAll();

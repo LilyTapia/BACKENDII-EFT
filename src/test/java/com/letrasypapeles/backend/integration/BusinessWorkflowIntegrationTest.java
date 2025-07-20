@@ -68,15 +68,6 @@ class BusinessWorkflowIntegrationTest {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private ClienteService clienteService;
-
-    @Autowired
-    private ProductoService productoService;
-
-    @Autowired
-    private ReservaService reservaService;
-
-    @Autowired
     private InventarioService inventarioService;
 
     private Cliente clienteTest;

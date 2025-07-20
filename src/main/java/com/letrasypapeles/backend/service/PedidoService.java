@@ -7,7 +7,7 @@ import com.letrasypapeles.backend.entity.Producto;
 import com.letrasypapeles.backend.repository.ClienteRepository;
 import com.letrasypapeles.backend.repository.PedidoRepository;
 import com.letrasypapeles.backend.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,14 +18,17 @@ import java.util.Optional;
 @Service
 public class PedidoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ClienteRepository clienteRepository;
+    private final ProductoRepository productoRepository;
 
-    @Autowired
-    private ClienteRepository clienteRepository;
-
-    @Autowired
-    private ProductoRepository productoRepository;
+    public PedidoService(PedidoRepository pedidoRepository,
+                        ClienteRepository clienteRepository,
+                        ProductoRepository productoRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.clienteRepository = clienteRepository;
+        this.productoRepository = productoRepository;
+    }
 
     public List<Pedido> obtenerTodos() {
         return pedidoRepository.findAll();

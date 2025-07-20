@@ -2,7 +2,7 @@ package com.letrasypapeles.backend.service;
 
 import com.letrasypapeles.backend.entity.Notificacion;
 import com.letrasypapeles.backend.repository.NotificacionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,8 +12,11 @@ import java.util.Optional;
 @Service
 public class NotificacionService {
 
-    @Autowired
-    private NotificacionRepository notificacionRepository;
+    private final NotificacionRepository notificacionRepository;
+
+    public NotificacionService(NotificacionRepository notificacionRepository) {
+        this.notificacionRepository = notificacionRepository;
+    }
 
     public List<Notificacion> obtenerTodas() {
         return notificacionRepository.findAll();

@@ -116,7 +116,7 @@ class RoleTest {
     @Test
     void equals_DifferentClass_ReturnsFalse() {
         // Given
-        String otherObject = "Not a Role";
+        Object otherObject = "Not a Role";
 
         // When & Then
         assertFalse(role.equals(otherObject));

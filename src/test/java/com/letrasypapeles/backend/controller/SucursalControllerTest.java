@@ -43,7 +43,7 @@ class SucursalControllerTest {
 
         ResponseEntity<List<Sucursal>> response = sucursalController.obtenerTodas();
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
         assertEquals("Sucursal Centro", response.getBody().get(0).getNombre());
     }
@@ -54,7 +54,7 @@ class SucursalControllerTest {
 
         ResponseEntity<Sucursal> response = sucursalController.obtenerPorId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("Sucursal Centro", response.getBody().getNombre());
     }
 
@@ -64,7 +64,7 @@ class SucursalControllerTest {
 
         ResponseEntity<Sucursal> response = sucursalController.obtenerPorId(1L);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -73,7 +73,7 @@ class SucursalControllerTest {
 
         ResponseEntity<Sucursal> response = sucursalController.guardar(sucursal);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("Sucursal Centro", response.getBody().getNombre());
     }
 
@@ -83,7 +83,7 @@ class SucursalControllerTest {
 
         ResponseEntity<Void> response = sucursalController.eliminar(1L);
 
-        assertEquals(204, response.getStatusCodeValue());
+        assertEquals(204, response.getStatusCode().value());
         verify(sucursalService, times(1)).eliminar(1L);
     }
 }

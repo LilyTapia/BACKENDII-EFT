@@ -1,6 +1,5 @@
 package com.letrasypapeles.backend.security;
 
-import com.letrasypapeles.backend.entity.Cliente;
 import com.letrasypapeles.backend.entity.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +37,6 @@ class JwtUtilTest {
     @InjectMocks
     private JwtUtil jwtUtil;
 
-    private Cliente cliente;
     private Role roleCliente;
     private Role roleAdmin;
 
@@ -56,18 +53,9 @@ class JwtUtilTest {
         roleAdmin = new Role();
         roleAdmin.setNombre("ADMIN");
 
-        // Configurar cliente
+        // Configurar roles
         Set<Role> roles = new HashSet<>();
         roles.add(roleCliente);
-        
-        cliente = Cliente.builder()
-                .id(1L)
-                .nombre("Test")
-                .apellido("Usuario")
-                .email("test@example.com")
-                .contraseña("password123")
-                .roles(roles)
-                .build();
     }
 
     @Test

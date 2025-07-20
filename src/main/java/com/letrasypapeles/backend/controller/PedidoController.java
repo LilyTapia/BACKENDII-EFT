@@ -7,7 +7,7 @@ import com.letrasypapeles.backend.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +21,13 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RequestMapping("/api/pedidos")
 public class PedidoController {
 
-    @Autowired
-    private PedidoService pedidoService;
+    private final PedidoService pedidoService;
+    private final PedidoModelAssembler pedidoModelAssembler;
 
-    @Autowired
-    private PedidoModelAssembler pedidoModelAssembler;
+    public PedidoController(PedidoService pedidoService, PedidoModelAssembler pedidoModelAssembler) {
+        this.pedidoService = pedidoService;
+        this.pedidoModelAssembler = pedidoModelAssembler;
+    }
 
     @Operation(summary = "Obtener todos los pedidos", description = "Retorna la lista de todos los pedidos registrados en el sistema.")
     @ApiResponses({

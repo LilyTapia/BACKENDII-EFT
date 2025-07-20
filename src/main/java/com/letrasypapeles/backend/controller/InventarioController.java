@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,11 +22,13 @@ import java.util.Map;
 @Tag(name = "Inventarios", description = "Operaciones para gestionar inventarios ")
 public class InventarioController {
 
-    @Autowired
-    private InventarioService inventarioService;
+    private final InventarioService inventarioService;
+    private final ProductoService productoService;
 
-    @Autowired
-    private ProductoService productoService;
+    public InventarioController(InventarioService inventarioService, ProductoService productoService) {
+        this.inventarioService = inventarioService;
+        this.productoService = productoService;
+    }
 
     @GetMapping("/api/inventarios")
     @Operation(summary = "Obtiene todos los inventarios", description = "Devuelve la lista completa de registros de inventario")
