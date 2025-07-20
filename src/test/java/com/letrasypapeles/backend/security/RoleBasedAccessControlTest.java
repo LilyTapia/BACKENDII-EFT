@@ -79,15 +79,15 @@ class RoleBasedAccessControlTest {
 
         // Crear roles
         roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
         roleCliente = roleRepository.save(roleCliente);
 
         roleAdmin = new Role();
-        roleAdmin.setNombre("ADMIN");
+        roleAdmin.setNombre("ROLE_GERENTE");
         roleAdmin = roleRepository.save(roleAdmin);
 
         roleVendedor = new Role();
-        roleVendedor.setNombre("VENDEDOR");
+        roleVendedor.setNombre("ROLE_EMPLEADO");
         roleVendedor = roleRepository.save(roleVendedor);
 
         // Crear usuario con rol CLIENTE
@@ -386,7 +386,7 @@ class RoleBasedAccessControlTest {
         mockMvc.perform(put("/api/admin/usuarios/" + clienteTestId + "/roles")
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"roles\": [\"CLIENTE\", \"VENDEDOR\"]}"))
+                .content("{\"roles\": [\"ROLE_CLIENTE\", \"ROLE_EMPLEADO\"]}"))
                 .andExpect(status().isOk());
 
         // Cliente NO puede modificar roles

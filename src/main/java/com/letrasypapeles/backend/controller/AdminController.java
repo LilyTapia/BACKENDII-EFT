@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('GERENTE')")
 @Tag(name = "Administración", description = "Operaciones administrativas de usuarios y roles")
 public class AdminController {
 

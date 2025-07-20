@@ -48,10 +48,10 @@ class JwtUtilTest {
 
         // Configurar roles
         roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
 
         roleAdmin = new Role();
-        roleAdmin.setNombre("ADMIN");
+        roleAdmin.setNombre("ROLE_GERENTE");
 
         // Configurar roles
         Set<Role> roles = new HashSet<>();

@@ -52,14 +52,40 @@ public class ClienteService {
         cliente.setContraseña(passwordEncoder.encode(cliente.getContraseña()));
         cliente.setPuntosFidelidad(0);
 
-        // Asignar el rol "CLIENTE"
-        Role roleCliente = roleRepository.findByNombre("CLIENTE")
+        // Asignar el rol "ROLE_CLIENTE"
+        Role roleCliente = roleRepository.findByNombre("ROLE_CLIENTE")
                 .orElseGet(() -> {
                     Role newRole = new Role();
-                    newRole.setNombre("CLIENTE");
-                    return newRole;
+                    newRole.setNombre("ROLE_CLIENTE");
+                    return roleRepository.save(newRole);
                 });
         cliente.setRoles(Collections.singleton(roleCliente));
+
+        return clienteRepository.save(cliente);
+    }
+
+    /**
+     * Registra un cliente con roles específicos (para uso administrativo)
+     */
+    public Cliente registrarClienteConRoles(Cliente cliente, Set<String> roleNames) {
+        if (clienteRepository.existsByEmail(cliente.getEmail())) {
+            throw new RuntimeException("El correo electrónico ya está registrado.");
+        }
+        cliente.setContraseña(passwordEncoder.encode(cliente.getContraseña()));
+        cliente.setPuntosFidelidad(0);
+
+        // Asignar roles específicos
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : roleNames) {
+            Role role = roleRepository.findByNombre(roleName)
+                    .orElseGet(() -> {
+                        Role newRole = new Role();
+                        newRole.setNombre(roleName);
+                        return roleRepository.save(newRole);
+                    });
+            roles.add(role);
+        }
+        cliente.setRoles(roles);
 
         return clienteRepository.save(cliente);
     }

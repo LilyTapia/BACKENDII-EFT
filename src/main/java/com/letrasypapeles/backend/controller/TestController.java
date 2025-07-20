@@ -21,7 +21,7 @@ public class TestController {
     }
 
     @GetMapping("/cliente")
-    @PreAuthorize("hasAuthority('CLIENTE') or hasAuthority('EMPLEADO') or hasAuthority('GERENTE')")
+    @PreAuthorize("hasRole('CLIENTE') or hasRole('EMPLEADO') or hasRole('GERENTE')")
     @Operation(summary = "Acceso cliente/empleado/gerente", description = "Endpoint accesible para usuarios con rol CLIENTE, EMPLEADO o GERENTE")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Contenido para clientes devuelto correctamente"),
@@ -32,7 +32,7 @@ public class TestController {
     }
 
     @GetMapping("/empleado")
-    @PreAuthorize("hasAuthority('EMPLEADO') or hasAuthority('GERENTE')")
+    @PreAuthorize("hasRole('EMPLEADO') or hasRole('GERENTE')")
     @Operation(summary = "Acceso empleado/gerente", description = "Endpoint accesible para usuarios con rol EMPLEADO o GERENTE")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Contenido para empleados devuelto correctamente"),
@@ -43,7 +43,7 @@ public class TestController {
     }
 
     @GetMapping("/gerente")
-    @PreAuthorize("hasAuthority('GERENTE')")
+    @PreAuthorize("hasRole('GERENTE')")
     @Operation(summary = "Acceso gerente", description = "Endpoint accesible únicamente para usuarios con rol GERENTE")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Contenido para gerentes devuelto correctamente"),

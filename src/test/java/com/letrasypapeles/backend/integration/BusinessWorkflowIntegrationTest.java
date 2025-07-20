@@ -90,7 +90,7 @@ class BusinessWorkflowIntegrationTest {
 
         // Crear rol cliente
         roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
         roleCliente = roleRepository.save(roleCliente);
 
         // Crear categoría

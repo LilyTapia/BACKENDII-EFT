@@ -31,7 +31,7 @@ class RoleControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         role = new Role();
-        role.setNombre("CLIENTE");
+        role.setNombre("ROLE_CLIENTE");
     }
 
     @Test
@@ -47,19 +47,19 @@ class RoleControllerTest {
 
     @Test
     void testObtenerPorNombre() {
-        when(roleService.obtenerPorNombre("CLIENTE")).thenReturn(Optional.of(role));
+        when(roleService.obtenerPorNombre("ROLE_CLIENTE")).thenReturn(Optional.of(role));
 
-        ResponseEntity<Role> response = roleController.obtenerPorNombre("CLIENTE");
+        ResponseEntity<Role> response = roleController.obtenerPorNombre("ROLE_CLIENTE");
 
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("CLIENTE", response.getBody().getNombre());
+        assertEquals("ROLE_CLIENTE", response.getBody().getNombre());
     }
 
     @Test
     void testObtenerPorNombreNoEncontrado() {
-        when(roleService.obtenerPorNombre("ADMIN")).thenReturn(Optional.empty());
+        when(roleService.obtenerPorNombre("ROLE_GERENTE")).thenReturn(Optional.empty());
 
-        ResponseEntity<Role> response = roleController.obtenerPorNombre("ADMIN");
+        ResponseEntity<Role> response = roleController.obtenerPorNombre("ROLE_GERENTE");
 
         assertEquals(404, response.getStatusCode().value());
     }
@@ -71,24 +71,24 @@ class RoleControllerTest {
         ResponseEntity<Role> response = roleController.crearRole(role);
 
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("CLIENTE", response.getBody().getNombre());
+        assertEquals("ROLE_CLIENTE", response.getBody().getNombre());
     }
 
     @Test
     void testEliminarRole() {
-        when(roleService.obtenerPorNombre("CLIENTE")).thenReturn(Optional.of(role));
-        doNothing().when(roleService).eliminar("CLIENTE");
+        when(roleService.obtenerPorNombre("ROLE_CLIENTE")).thenReturn(Optional.of(role));
+        doNothing().when(roleService).eliminar("ROLE_CLIENTE");
 
-        ResponseEntity<Void> response = roleController.eliminarRole("CLIENTE");
+        ResponseEntity<Void> response = roleController.eliminarRole("ROLE_CLIENTE");
 
         assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
     void testEliminarRoleNoEncontrado() {
-        when(roleService.obtenerPorNombre("ADMIN")).thenReturn(Optional.empty());
+        when(roleService.obtenerPorNombre("ROLE_GERENTE")).thenReturn(Optional.empty());
 
-        ResponseEntity<Void> response = roleController.eliminarRole("ADMIN");
+        ResponseEntity<Void> response = roleController.eliminarRole("ROLE_GERENTE");
 
         assertEquals(404, response.getStatusCode().value());
     }

@@ -111,7 +111,7 @@ public class InventarioController {
     // Endpoints singulares para compatibilidad con tests
 
     @PostMapping("/api/inventario")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GERENTE')")
     @Operation(summary = "Crea inventario (singular)", description = "Guarda inventario usando formato singular para compatibilidad con tests")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Inventario creado exitosamente"),
@@ -142,7 +142,7 @@ public class InventarioController {
     }
 
     @PutMapping("/api/inventario/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
+    @PreAuthorize("hasRole('GERENTE') or hasRole('EMPLEADO')")
     @Operation(summary = "Actualiza inventario (singular)", description = "Modifica cantidad de inventario usando formato singular para compatibilidad con tests")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Inventario actualizado exitosamente"),
@@ -167,7 +167,7 @@ public class InventarioController {
     }
 
     @GetMapping("/api/inventario/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
+    @PreAuthorize("hasRole('GERENTE') or hasRole('EMPLEADO')")
     @Operation(summary = "Obtiene inventario (singular)", description = "Recupera inventario usando formato singular para compatibilidad con tests")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Inventario recuperado exitosamente"),

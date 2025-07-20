@@ -34,7 +34,7 @@ public class ClienteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GERENTE')")
     @Operation(summary = "Obtiene todos los clientes", description = "Devuelve la lista completa de clientes registrados")
     @ApiResponse(responseCode = "200", description = "Clientes recuperados exitosamente")
     public ResponseEntity<CollectionModel<EntityModel<Cliente>>> obtenerTodos() {

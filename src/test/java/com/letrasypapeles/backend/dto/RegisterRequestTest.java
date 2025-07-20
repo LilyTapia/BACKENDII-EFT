@@ -106,7 +106,7 @@ class RegisterRequestTest {
                 "mypassword321",
                 "555123456",
                 "Calle Nueva 789",
-                Set.of("VENDEDOR")
+                Set.of("ROLE_EMPLEADO")
         );
 
         assertEquals("Ana", requestCompleto.getNombre());
@@ -115,7 +115,7 @@ class RegisterRequestTest {
         assertEquals("mypassword321", requestCompleto.getPassword());
         assertEquals("555123456", requestCompleto.getTelefono());
         assertEquals("Calle Nueva 789", requestCompleto.getDireccion());
-        assertEquals(Set.of("VENDEDOR"), requestCompleto.getRoles());
+        assertEquals(Set.of("ROLE_EMPLEADO"), requestCompleto.getRoles());
     }
 
     @Test

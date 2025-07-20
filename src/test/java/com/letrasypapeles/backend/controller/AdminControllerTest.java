@@ -42,7 +42,7 @@ class AdminControllerTest {
         cliente.setEmail("admin@test.com");
 
         role = new Role();
-        role.setNombre("ADMIN");
+        role.setNombre("ROLE_GERENTE");
     }
 
     @Test
@@ -90,13 +90,13 @@ class AdminControllerTest {
 
     @Test
     void testActualizarRolesUsuario() {
-        List<String> roles = Arrays.asList("ADMIN", "USER");
+        List<String> roles = Arrays.asList("ROLE_GERENTE", "ROLE_CLIENTE");
         Map<String, List<String>> request = new HashMap<>();
         request.put("roles", roles);
 
         when(clienteService.obtenerClientePorId(1L)).thenReturn(cliente);
-        when(roleService.obtenerRolePorNombre("ADMIN")).thenReturn(role);
-        when(roleService.obtenerRolePorNombre("USER")).thenReturn(new Role());
+        when(roleService.obtenerRolePorNombre("ROLE_GERENTE")).thenReturn(role);
+        when(roleService.obtenerRolePorNombre("ROLE_CLIENTE")).thenReturn(new Role());
 
         ResponseEntity<?> response = adminController.actualizarRolesUsuario(1L, request);
 
@@ -128,7 +128,7 @@ class AdminControllerTest {
 
     @Test
     void testActualizarRolesUsuario_UsuarioNoEncontrado() {
-        List<String> roles = Arrays.asList("ADMIN");
+        List<String> roles = Arrays.asList("ROLE_GERENTE");
         Map<String, List<String>> request = new HashMap<>();
         request.put("roles", roles);
 

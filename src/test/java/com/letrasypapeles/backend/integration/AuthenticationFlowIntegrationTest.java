@@ -57,7 +57,7 @@ class AuthenticationFlowIntegrationTest {
     private JwtUtil jwtUtil;
 
     private Role roleCliente;
-    private Role roleAdmin;
+    private Role roleGerente;
 
     @BeforeEach
     void setUp() {
@@ -67,12 +67,12 @@ class AuthenticationFlowIntegrationTest {
 
         // Crear roles
         roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
         roleCliente = roleRepository.save(roleCliente);
 
-        roleAdmin = new Role();
-        roleAdmin.setNombre("ADMIN");
-        roleAdmin = roleRepository.save(roleAdmin);
+        roleGerente = new Role();
+        roleGerente.setNombre("ROLE_GERENTE");
+        roleGerente = roleRepository.save(roleGerente);
     }
 
     @Test
@@ -134,19 +134,19 @@ class AuthenticationFlowIntegrationTest {
 
     @Test
     void testFlow_AutenticacionConRolesYPermisos() throws Exception {
-        // Crear usuario admin
-        Set<Role> adminRoles = new HashSet<>();
-        adminRoles.add(roleAdmin);
+        // Crear usuario gerente
+        Set<Role> gerenteRoles = new HashSet<>();
+        gerenteRoles.add(roleGerente);
 
-        Cliente adminUser = Cliente.builder()
-                .nombre("Admin")
+        Cliente gerenteUser = Cliente.builder()
+                .nombre("Gerente")
                 .apellido("Usuario")
-                .email("admin@example.com")
-                .contraseña(passwordEncoder.encode("admin123"))
+                .email("gerente@example.com")
+                .contraseña(passwordEncoder.encode("gerente123"))
                 .puntosFidelidad(0)
-                .roles(adminRoles)
+                .roles(gerenteRoles)
                 .build();
-        clienteRepository.save(adminUser);
+        clienteRepository.save(gerenteUser);
 
         // Crear usuario cliente
         Set<Role> clienteRoles = new HashSet<>();
@@ -162,18 +162,18 @@ class AuthenticationFlowIntegrationTest {
                 .build();
         clienteRepository.save(clienteUser);
 
-        // Login como admin
-        LoginRequest adminLogin = new LoginRequest();
-        adminLogin.setEmail("admin@example.com");
-        adminLogin.setPassword("admin123");
+        // Login como gerente
+        LoginRequest gerenteLogin = new LoginRequest();
+        gerenteLogin.setEmail("gerente@example.com");
+        gerenteLogin.setPassword("gerente123");
 
-        MvcResult adminLoginResult = mockMvc.perform(post("/api/auth/login")
+        MvcResult gerenteLoginResult = mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(adminLogin)))
+                .content(objectMapper.writeValueAsString(gerenteLogin)))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String adminToken = objectMapper.readTree(adminLoginResult.getResponse().getContentAsString())
+        String gerenteToken = objectMapper.readTree(gerenteLoginResult.getResponse().getContentAsString())
                 .get("token").asText();
 
         // Login como cliente
@@ -190,9 +190,9 @@ class AuthenticationFlowIntegrationTest {
         String clienteToken = objectMapper.readTree(clienteLoginResult.getResponse().getContentAsString())
                 .get("token").asText();
 
-        // Admin puede acceder a endpoints administrativos
+        // Gerente puede acceder a endpoints administrativos
         mockMvc.perform(get("/api/admin/usuarios")
-                .header("Authorization", "Bearer " + adminToken))
+                .header("Authorization", "Bearer " + gerenteToken))
                 .andExpect(status().isOk());
 
         // Cliente NO puede acceder a endpoints administrativos
@@ -202,7 +202,7 @@ class AuthenticationFlowIntegrationTest {
 
         // Ambos pueden acceder a endpoints generales
         mockMvc.perform(get("/api/productos")
-                .header("Authorization", "Bearer " + adminToken))
+                .header("Authorization", "Bearer " + gerenteToken))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/productos")

@@ -59,7 +59,7 @@ public class ReservaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('CLIENTE') or hasRole('VENDEDOR')")
+    @PreAuthorize("hasRole('GERENTE') or hasRole('CLIENTE') or hasRole('EMPLEADO')")
     @Operation(summary = "Obtiene todas las reservas", description = "Devuelve la lista completa de reservas")
     @ApiResponse(responseCode = "200", description = "Reservas recuperadas exitosamente")
     public ResponseEntity<CollectionModel<EntityModel<Reserva>>> obtenerTodas() {
@@ -226,7 +226,7 @@ public class ReservaController {
     }
 
     @PutMapping("/{id}/confirmar")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('CLIENTE') or hasRole('VENDEDOR')")
+    @PreAuthorize("hasRole('GERENTE') or hasRole('CLIENTE') or hasRole('EMPLEADO')")
     @Operation(summary = "Confirma una reserva", description = "Cambia el estado de la reserva a CONFIRMADA y otorga puntos de fidelidad")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Reserva confirmada exitosamente"),
@@ -267,7 +267,7 @@ public class ReservaController {
     }
 
     @PutMapping("/{id}/cancelar")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('CLIENTE') or hasRole('VENDEDOR')")
+    @PreAuthorize("hasRole('GERENTE') or hasRole('CLIENTE') or hasRole('EMPLEADO')")
     @Operation(summary = "Cancela una reserva", description = "Cambia el estado de la reserva a CANCELADA y restaura stock e inventario")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Reserva cancelada exitosamente"),

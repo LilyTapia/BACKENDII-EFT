@@ -41,11 +41,18 @@ public class UsuarioService implements UserDetailsService {
 
     private Collection<GrantedAuthority> getAuthorities(Cliente cliente) {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        System.out.println("=== DEBUG: Cargando autoridades para usuario: " + cliente.getEmail() + " ===");
+        System.out.println("Roles encontrados: " + cliente.getRoles().size());
+
         cliente.getRoles().forEach(role -> {
+            System.out.println("Rol original en BD: '" + role.getNombre() + "'");
             String roleName = role.getNombre().startsWith("ROLE_") ? role.getNombre() : "ROLE_" + role.getNombre();
             authorities.add(new SimpleGrantedAuthority(roleName));
-            System.out.println("Agregando autoridad: " + roleName);
+            System.out.println("Autoridad agregada: '" + roleName + "'");
         });
+
+        System.out.println("Total autoridades: " + authorities.size());
+        System.out.println("=== FIN DEBUG ===");
         return new ArrayList<>(authorities);
     }
 }

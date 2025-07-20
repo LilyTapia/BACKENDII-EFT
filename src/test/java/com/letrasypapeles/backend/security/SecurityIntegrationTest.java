@@ -63,11 +63,11 @@ class SecurityIntegrationTest {
 
         // Crear roles
         roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
         roleCliente = roleRepository.save(roleCliente);
 
         roleAdmin = new Role();
-        roleAdmin.setNombre("ADMIN");
+        roleAdmin.setNombre("ROLE_GERENTE");
         roleAdmin = roleRepository.save(roleAdmin);
 
         // Crear cliente de prueba

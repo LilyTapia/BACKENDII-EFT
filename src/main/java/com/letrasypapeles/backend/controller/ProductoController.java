@@ -38,7 +38,7 @@ public class ProductoController {
         @ApiResponse(responseCode = "200", description = "Lista de productos obtenida correctamente")
     })
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('CLIENTE') or hasRole('VENDEDOR')")
+    @PreAuthorize("hasRole('GERENTE') or hasRole('CLIENTE') or hasRole('EMPLEADO')")
     public ResponseEntity<CollectionModel<EntityModel<Producto>>> obtenerTodos() {
         List<Producto> productos = productoService.obtenerTodos();
         List<EntityModel<Producto>> productosModel = productos.stream()
@@ -72,7 +72,7 @@ public class ProductoController {
         @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content)
     })
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<EntityModel<Producto>> crearProducto(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                 description = "Datos del nuevo producto",
@@ -111,7 +111,7 @@ public class ProductoController {
         @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Void> eliminarProducto(
             @Parameter(description = "ID del producto a eliminar", required = true)
             @PathVariable Long id) {

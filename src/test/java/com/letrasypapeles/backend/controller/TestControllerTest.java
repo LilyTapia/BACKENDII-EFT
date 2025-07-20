@@ -27,42 +27,42 @@ class TestControllerTest {
     }
 
     @Test
-    @WithMockUser(authorities = { "CLIENTE" })
+    @WithMockUser(authorities = { "ROLE_CLIENTE" })
     void testClienteAccess() {
         String result = testController.clienteAccess();
         assertEquals("Contenido para clientes", result);
     }
 
     @Test
-    @WithMockUser(authorities = { "EMPLEADO" })
+    @WithMockUser(authorities = { "ROLE_EMPLEADO" })
     void testEmpleadoAccess() {
         String result = testController.empleadoAccess();
         assertEquals("Contenido para empleados", result);
     }
 
     @Test
-    @WithMockUser(authorities = { "GERENTE" })
+    @WithMockUser(authorities = { "ROLE_GERENTE" })
     void testGerenteAccess() {
         String result = testController.gerenteAccess();
         assertEquals("Contenido para gerentes", result);
     }
 
     @Test
-    @WithMockUser(authorities = { "EMPLEADO" })
+    @WithMockUser(authorities = { "ROLE_EMPLEADO" })
     void testClienteAccessConEmpleado() {
         String result = testController.clienteAccess();
         assertEquals("Contenido para clientes", result);
     }
 
     @Test
-    @WithMockUser(authorities = { "GERENTE" })
+    @WithMockUser(authorities = { "ROLE_GERENTE" })
     void testEmpleadoAccessConGerente() {
         String result = testController.empleadoAccess();
         assertEquals("Contenido para empleados", result);
     }
 
     @Test
-    @WithMockUser(authorities = { "GERENTE" })
+    @WithMockUser(authorities = { "ROLE_GERENTE" })
     void testClienteAccessConGerente() {
         String result = testController.clienteAccess();
         assertEquals("Contenido para clientes", result);

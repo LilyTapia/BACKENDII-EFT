@@ -63,15 +63,15 @@ public class DataInitializer implements CommandLineRunner {
         Role roleCliente = new Role();
         roleCliente.setNombre("ROLE_CLIENTE");
 
-        Role roleVendedor = new Role();
-        roleVendedor.setNombre("ROLE_VENDEDOR");
+        Role roleEmpleado = new Role();
+        roleEmpleado.setNombre("ROLE_EMPLEADO");
 
-        Role roleAdmin = new Role();
-        roleAdmin.setNombre("ROLE_ADMIN");
+        Role roleGerente = new Role();
+        roleGerente.setNombre("ROLE_GERENTE");
 
         roleRepository.save(roleCliente);
-        roleRepository.save(roleVendedor);
-        roleRepository.save(roleAdmin);
+        roleRepository.save(roleEmpleado);
+        roleRepository.save(roleGerente);
 
         // Initialize Categories
         Categoria papeleria = new Categoria();
@@ -124,14 +124,38 @@ public class DataInitializer implements CommandLineRunner {
         sur.setDireccion("Av. Sur 789");
         sucursalRepository.save(sur);
 
-        // Initialize Clients
+        // Initialize Clients - Fetch roles from database to avoid cascade issues
+        Role savedRoleCliente = roleRepository.findByNombre("ROLE_CLIENTE").orElse(roleCliente);
+        Role savedRoleGerente = roleRepository.findByNombre("ROLE_GERENTE").orElse(roleGerente);
+        Role savedRoleEmpleado = roleRepository.findByNombre("ROLE_EMPLEADO").orElse(roleEmpleado);
+
+        // Create gerente user
+        Cliente gerente = new Cliente();
+        gerente.setNombre("Gerente");
+        gerente.setApellido("Usuario");
+        gerente.setEmail("gerente@letrasypapeles.com");
+        gerente.setContraseña(passwordEncoder.encode("gerente123"));
+        gerente.setPuntosFidelidad(0);
+        gerente.setRoles(Set.of(savedRoleGerente));
+        clienteRepository.save(gerente);
+
+        // Create empleado user
+        Cliente empleado = new Cliente();
+        empleado.setNombre("Empleado");
+        empleado.setApellido("Usuario");
+        empleado.setEmail("empleado@letrasypapeles.com");
+        empleado.setContraseña(passwordEncoder.encode("empleado123"));
+        empleado.setPuntosFidelidad(0);
+        empleado.setRoles(Set.of(savedRoleEmpleado));
+        clienteRepository.save(empleado);
+
         Cliente juan = new Cliente();
         juan.setNombre("Juan");
         juan.setApellido("Pérez");
         juan.setEmail("juan.perez@example.com");
         juan.setContraseña(passwordEncoder.encode("password123"));
         juan.setPuntosFidelidad(150);
-        juan.setRoles(Set.of(roleCliente));
+        juan.setRoles(Set.of(savedRoleCliente));
         clienteRepository.save(juan);
 
         Cliente ana = new Cliente();
@@ -140,7 +164,7 @@ public class DataInitializer implements CommandLineRunner {
         ana.setEmail("ana.lopez@example.com");
         ana.setContraseña(passwordEncoder.encode("password456"));
         ana.setPuntosFidelidad(300);
-        ana.setRoles(Set.of(roleCliente));
+        ana.setRoles(Set.of(savedRoleCliente));
         clienteRepository.save(ana);
 
         Cliente carlos = new Cliente();
@@ -149,7 +173,7 @@ public class DataInitializer implements CommandLineRunner {
         carlos.setEmail("carlos.gonzalez@example.com");
         carlos.setContraseña(passwordEncoder.encode("password789"));
         carlos.setPuntosFidelidad(75);
-        carlos.setRoles(Set.of(roleCliente));
+        carlos.setRoles(Set.of(savedRoleCliente));
         clienteRepository.save(carlos);
 
         // Initialize Products

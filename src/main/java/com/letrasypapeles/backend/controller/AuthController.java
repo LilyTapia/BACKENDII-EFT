@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.util.Set;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -74,11 +76,50 @@ public class AuthController {
             cliente.setApellido(registroRequest.getApellido());
             cliente.setEmail(registroRequest.getEmail());
             cliente.setContraseña(registroRequest.getPassword());
-            Cliente registrado = clienteService.registrarCliente(cliente);
+
+            Cliente registrado;
+            if (registroRequest.getRoles() != null && !registroRequest.getRoles().isEmpty()) {
+                // Registrar con roles específicos
+                registrado = clienteService.registrarClienteConRoles(cliente, registroRequest.getRoles());
+            } else {
+                // Registrar con rol por defecto (CLIENTE)
+                registrado = clienteService.registrarCliente(cliente);
+            }
+
             return ResponseEntity.ok(registrado);
         } catch (RuntimeException e) {
             MessageResponse response = new MessageResponse();
             response.setMessage("Error al registrar usuario: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @PostMapping("/create-manager")
+    @Operation(summary = "Crea usuario gerente", description = "Crea el usuario gerente por defecto si no existe")
+    public ResponseEntity<?> crearGerente() {
+        try {
+            // Verificar si ya existe
+            if (clienteService.obtenerPorEmail("gerente@letrasypapeles.com").isPresent()) {
+                MessageResponse response = new MessageResponse();
+                response.setMessage("El usuario gerente ya existe");
+                return ResponseEntity.ok(response);
+            }
+
+            Cliente gerente = new Cliente();
+            gerente.setNombre("Gerente");
+            gerente.setApellido("Usuario");
+            gerente.setEmail("gerente@letrasypapeles.com");
+            gerente.setContraseña("gerente123");
+
+            Set<String> roles = Set.of("ROLE_GERENTE");
+            Cliente registrado = clienteService.registrarClienteConRoles(gerente, roles);
+
+            MessageResponse response = new MessageResponse();
+            response.setMessage("Usuario gerente creado exitosamente");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            MessageResponse response = new MessageResponse();
+            response.setMessage("Error al crear gerente: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
     }

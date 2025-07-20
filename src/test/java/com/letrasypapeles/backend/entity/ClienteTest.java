@@ -17,12 +17,12 @@ class ClienteTest {
     @BeforeEach
     void setUp() {
         roleCliente = Role.builder()
-                .nombre("CLIENTE")
+                .nombre("ROLE_CLIENTE")
                 .clientes(new HashSet<>())
                 .build();
 
         roleAdmin = Role.builder()
-                .nombre("ADMIN")
+                .nombre("ROLE_GERENTE")
                 .clientes(new HashSet<>())
                 .build();
 

@@ -17,7 +17,7 @@ class RoleTest {
     @BeforeEach
     void setUp() {
         role = Role.builder()
-                .nombre("CLIENTE")
+                .nombre("ROLE_CLIENTE")
                 .clientes(new HashSet<>())
                 .build();
 
@@ -55,11 +55,11 @@ class RoleTest {
         clientes.add(cliente1);
 
         // When
-        Role roleCompleto = new Role("ADMIN", clientes);
+        Role roleCompleto = new Role("ROLE_GERENTE", clientes);
 
         // Then
         assertNotNull(roleCompleto);
-        assertEquals("ADMIN", roleCompleto.getNombre());
+        assertEquals("ROLE_GERENTE", roleCompleto.getNombre());
         assertEquals(1, roleCompleto.getClientes().size());
         assertTrue(roleCompleto.getClientes().contains(cliente1));
     }
@@ -84,7 +84,7 @@ class RoleTest {
 
         // Then
         assertNotNull(toStringResult);
-        assertEquals("Role{nombre='CLIENTE'}", toStringResult);
+        assertEquals("Role{nombre='ROLE_CLIENTE'}", toStringResult);
     }
 
     @Test
@@ -126,7 +126,7 @@ class RoleTest {
     void equals_SameNombre_ReturnsTrue() {
         // Given
         Role otherRole = Role.builder()
-                .nombre("CLIENTE")
+                .nombre("ROLE_CLIENTE")
                 .build();
 
         // When & Then
@@ -137,7 +137,7 @@ class RoleTest {
     void equals_DifferentNombre_ReturnsFalse() {
         // Given
         Role otherRole = Role.builder()
-                .nombre("ADMIN")
+                .nombre("ROLE_GERENTE")
                 .build();
 
         // When & Then
@@ -150,7 +150,7 @@ class RoleTest {
         Role roleNullNombre = new Role();
         roleNullNombre.setNombre(null);
         Role otherRole = Role.builder()
-                .nombre("CLIENTE")
+                .nombre("ROLE_CLIENTE")
                 .build();
 
         // When & Then
@@ -173,7 +173,7 @@ class RoleTest {
     void hashCode_SameNombre_ReturnsSameHashCode() {
         // Given
         Role otherRole = Role.builder()
-                .nombre("CLIENTE")
+                .nombre("ROLE_CLIENTE")
                 .build();
 
         // When & Then
@@ -184,7 +184,7 @@ class RoleTest {
     void hashCode_DifferentNombre_ReturnsDifferentHashCode() {
         // Given
         Role otherRole = Role.builder()
-                .nombre("ADMIN")
+                .nombre("ROLE_GERENTE")
                 .build();
 
         // When & Then

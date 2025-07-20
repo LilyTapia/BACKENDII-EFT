@@ -40,7 +40,7 @@ public class ClienteServiceTest {
     void setUp() {
         // Configurar datos de prueba
         role = new Role();
-        role.setNombre("CLIENTE");
+        role.setNombre("ROLE_CLIENTE");
 
         cliente = Cliente.builder()
                 .id(1L)
@@ -128,7 +128,7 @@ public class ClienteServiceTest {
         String encodedPassword = "encoded_password";
         when(clienteRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
-        when(roleRepository.findByNombre("CLIENTE")).thenReturn(Optional.of(role));
+        when(roleRepository.findByNombre("ROLE_CLIENTE")).thenReturn(Optional.of(role));
         when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
 
         // When
@@ -143,7 +143,7 @@ public class ClienteServiceTest {
         // Then
         assertNotNull(result);
         verify(passwordEncoder, times(1)).encode(rawPassword);
-        verify(roleRepository, times(1)).findByNombre("CLIENTE");
+        verify(roleRepository, times(1)).findByNombre("ROLE_CLIENTE");
         verify(clienteRepository, times(1)).save(any(Cliente.class));
     }
 
@@ -329,9 +329,9 @@ public class ClienteServiceTest {
     void tieneRole_ClienteConRole() {
         // Given
         Long clienteId = 1L;
-        String nombreRole = "CLIENTE";
+        String nombreRole = "ROLE_CLIENTE";
         Role roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
 
         Cliente clienteConRole = Cliente.builder()
                 .id(clienteId)
@@ -357,7 +357,7 @@ public class ClienteServiceTest {
         Long clienteId = 1L;
         String nombreRole = "ADMIN";
         Role roleCliente = new Role();
-        roleCliente.setNombre("CLIENTE");
+        roleCliente.setNombre("ROLE_CLIENTE");
 
         Cliente clienteConRole = Cliente.builder()
                 .id(clienteId)
@@ -510,7 +510,7 @@ public class ClienteServiceTest {
         String encodedPassword = "encoded_password";
         when(clienteRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
-        when(roleRepository.findByNombre("CLIENTE")).thenReturn(Optional.empty()); // Role no existe
+        when(roleRepository.findByNombre("ROLE_CLIENTE")).thenReturn(Optional.empty()); // Role no existe
         when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
 
         // When
@@ -525,7 +525,7 @@ public class ClienteServiceTest {
         // Then
         assertNotNull(result);
         verify(passwordEncoder, times(1)).encode(rawPassword);
-        verify(roleRepository, times(1)).findByNombre("CLIENTE");
+        verify(roleRepository, times(1)).findByNombre("ROLE_CLIENTE");
         verify(clienteRepository, times(1)).save(any(Cliente.class));
         // Verificar que se inicializan los puntos de fidelidad en 0
         assertEquals(0, clienteInput.getPuntosFidelidad());
