@@ -299,4 +299,19 @@ class ClienteTest {
         // Then
         assertEquals(-10, cliente.getPuntosFidelidad());
     }
+
+    @Test
+    void testBuilderToString() {
+        Cliente.ClienteBuilder builder = Cliente.builder()
+                .id(1L)
+                .nombre("Test")
+                .apellido("User")
+                .email("test@example.com")
+                .contraseña("password")
+                .puntosFidelidad(100);
+
+        String builderToString = builder.toString();
+        assertNotNull(builderToString);
+        assertTrue(builderToString.contains("ClienteBuilder"));
+    }
 }

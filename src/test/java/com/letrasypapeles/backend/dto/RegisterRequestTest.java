@@ -179,4 +179,86 @@ class RegisterRequestTest {
 
         assertEquals(request1.hashCode(), request2.hashCode());
     }
+
+    @Test
+    void testEqualsComprehensive() {
+        RegisterRequest request1 = new RegisterRequest("Juan", "Perez", "juan@test.com", "password123", "123456789", "Calle 123", Set.of("CLIENTE"));
+
+        // Test with different field values
+        RegisterRequest requestDifferentNombre = new RegisterRequest("Maria", "Perez", "juan@test.com", "password123", "123456789", "Calle 123", Set.of("CLIENTE"));
+        assertNotEquals(request1, requestDifferentNombre);
+
+        RegisterRequest requestDifferentApellido = new RegisterRequest("Juan", "Garcia", "juan@test.com", "password123", "123456789", "Calle 123", Set.of("CLIENTE"));
+        assertNotEquals(request1, requestDifferentApellido);
+
+        RegisterRequest requestDifferentEmail = new RegisterRequest("Juan", "Perez", "maria@test.com", "password123", "123456789", "Calle 123", Set.of("CLIENTE"));
+        assertNotEquals(request1, requestDifferentEmail);
+
+        RegisterRequest requestDifferentPassword = new RegisterRequest("Juan", "Perez", "juan@test.com", "password456", "123456789", "Calle 123", Set.of("CLIENTE"));
+        assertNotEquals(request1, requestDifferentPassword);
+
+        RegisterRequest requestDifferentTelefono = new RegisterRequest("Juan", "Perez", "juan@test.com", "password123", "987654321", "Calle 123", Set.of("CLIENTE"));
+        assertNotEquals(request1, requestDifferentTelefono);
+
+        RegisterRequest requestDifferentDireccion = new RegisterRequest("Juan", "Perez", "juan@test.com", "password123", "123456789", "Avenida 456", Set.of("CLIENTE"));
+        assertNotEquals(request1, requestDifferentDireccion);
+
+        RegisterRequest requestDifferentRoles = new RegisterRequest("Juan", "Perez", "juan@test.com", "password123", "123456789", "Calle 123", Set.of("ADMIN"));
+        assertNotEquals(request1, requestDifferentRoles);
+    }
+
+    @Test
+    void testEqualsWithNullFieldsComprehensive() {
+        RegisterRequest request1 = new RegisterRequest();
+        RegisterRequest request2 = new RegisterRequest();
+
+        // Both null
+        assertEquals(request1, request2);
+
+        // Test each field individually
+        request1.setNombre("Juan");
+        assertNotEquals(request1, request2);
+        request2.setNombre("Juan");
+        assertEquals(request1, request2);
+
+        request1.setApellido("Perez");
+        assertNotEquals(request1, request2);
+        request2.setApellido("Perez");
+        assertEquals(request1, request2);
+
+        request1.setEmail("juan@test.com");
+        assertNotEquals(request1, request2);
+        request2.setEmail("juan@test.com");
+        assertEquals(request1, request2);
+
+        request1.setPassword("password123");
+        assertNotEquals(request1, request2);
+        request2.setPassword("password123");
+        assertEquals(request1, request2);
+
+        request1.setTelefono("123456789");
+        assertNotEquals(request1, request2);
+        request2.setTelefono("123456789");
+        assertEquals(request1, request2);
+
+        request1.setDireccion("Calle 123");
+        assertNotEquals(request1, request2);
+        request2.setDireccion("Calle 123");
+        assertEquals(request1, request2);
+
+        request1.setRoles(Set.of("CLIENTE"));
+        assertNotEquals(request1, request2);
+        request2.setRoles(Set.of("CLIENTE"));
+        assertEquals(request1, request2);
+    }
+
+    @Test
+    void testCanEqual() {
+        RegisterRequest request1 = new RegisterRequest();
+        RegisterRequest request2 = new RegisterRequest();
+
+        assertTrue(request1.canEqual(request2));
+        assertFalse(request1.canEqual("string"));
+        assertFalse(request1.canEqual(null));
+    }
 }

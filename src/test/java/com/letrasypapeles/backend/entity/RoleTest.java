@@ -300,4 +300,14 @@ class RoleTest {
         assertTrue(role1.equals(role2));
         assertEquals(role1.hashCode(), role2.hashCode());
     }
+
+    @Test
+    void testBuilderToString() {
+        Role.RoleBuilder builder = Role.builder()
+                .nombre("TEST_ROLE");
+
+        String builderToString = builder.toString();
+        assertNotNull(builderToString);
+        assertTrue(builderToString.contains("RoleBuilder"));
+    }
 }

@@ -377,4 +377,181 @@ class ProductoTest {
         assertEquals(categoria, productoFromBuilder.getCategoria());
         assertEquals(proveedor, productoFromBuilder.getProveedor());
     }
+
+    @Test
+    void testEqualsComprehensiveEdgeCases() {
+        Producto producto1 = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(100)
+                .categoria(categoria)
+                .proveedor(proveedor)
+                .build();
+
+        // Test with different field values to cover all equals branches
+        Producto productoDifferentId = Producto.builder()
+                .id(2L)
+                .nombre("Test Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(100)
+                .categoria(categoria)
+                .proveedor(proveedor)
+                .build();
+        assertNotEquals(producto1, productoDifferentId);
+
+        Producto productoDifferentNombre = Producto.builder()
+                .id(1L)
+                .nombre("Otro Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(100)
+                .categoria(categoria)
+                .proveedor(proveedor)
+                .build();
+        assertNotEquals(producto1, productoDifferentNombre);
+
+        Producto productoDifferentDescripcion = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .descripcion("Otra Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(100)
+                .categoria(categoria)
+                .proveedor(proveedor)
+                .build();
+        assertNotEquals(producto1, productoDifferentDescripcion);
+
+        Producto productoDifferentPrecio = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("20.00"))
+                .stock(100)
+                .categoria(categoria)
+                .proveedor(proveedor)
+                .build();
+        assertNotEquals(producto1, productoDifferentPrecio);
+
+        Producto productoDifferentStock = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(200)
+                .categoria(categoria)
+                .proveedor(proveedor)
+                .build();
+        assertNotEquals(producto1, productoDifferentStock);
+
+        // Test with null categoria
+        Producto productoNullCategoria = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(100)
+                .categoria(null)
+                .proveedor(proveedor)
+                .build();
+        assertNotEquals(producto1, productoNullCategoria);
+
+        // Test with null proveedor
+        Producto productoNullProveedor = Producto.builder()
+                .id(1L)
+                .nombre("Test Producto")
+                .descripcion("Test Descripcion")
+                .precio(new BigDecimal("10.00"))
+                .stock(100)
+                .categoria(categoria)
+                .proveedor(null)
+                .build();
+        assertNotEquals(producto1, productoNullProveedor);
+    }
+
+    @Test
+    void testEqualsWithAllNullFields() {
+        Producto producto1 = new Producto();
+        Producto producto2 = new Producto();
+
+        // Both completely null
+        assertEquals(producto1, producto2);
+
+        // Test each field being null vs non-null
+        producto1.setId(null);
+        producto2.setId(1L);
+        assertNotEquals(producto1, producto2);
+
+        producto1.setId(1L);
+        producto2.setId(null);
+        assertNotEquals(producto1, producto2);
+
+        // Reset and test nombre
+        producto1 = new Producto();
+        producto2 = new Producto();
+        producto1.setNombre(null);
+        producto2.setNombre("Test");
+        assertNotEquals(producto1, producto2);
+
+        producto1.setNombre("Test");
+        producto2.setNombre(null);
+        assertNotEquals(producto1, producto2);
+
+        // Reset and test descripcion
+        producto1 = new Producto();
+        producto2 = new Producto();
+        producto1.setDescripcion(null);
+        producto2.setDescripcion("Test");
+        assertNotEquals(producto1, producto2);
+
+        producto1.setDescripcion("Test");
+        producto2.setDescripcion(null);
+        assertNotEquals(producto1, producto2);
+
+        // Reset and test precio
+        producto1 = new Producto();
+        producto2 = new Producto();
+        producto1.setPrecio(null);
+        producto2.setPrecio(new BigDecimal("10.00"));
+        assertNotEquals(producto1, producto2);
+
+        producto1.setPrecio(new BigDecimal("10.00"));
+        producto2.setPrecio(null);
+        assertNotEquals(producto1, producto2);
+
+        // Reset and test stock
+        producto1 = new Producto();
+        producto2 = new Producto();
+        producto1.setStock(null);
+        producto2.setStock(100);
+        assertNotEquals(producto1, producto2);
+
+        producto1.setStock(100);
+        producto2.setStock(null);
+        assertNotEquals(producto1, producto2);
+
+        // Reset and test categoria
+        producto1 = new Producto();
+        producto2 = new Producto();
+        producto1.setCategoria(null);
+        producto2.setCategoria(categoria);
+        assertNotEquals(producto1, producto2);
+
+        producto1.setCategoria(categoria);
+        producto2.setCategoria(null);
+        assertNotEquals(producto1, producto2);
+
+        // Reset and test proveedor
+        producto1 = new Producto();
+        producto2 = new Producto();
+        producto1.setProveedor(null);
+        producto2.setProveedor(proveedor);
+        assertNotEquals(producto1, producto2);
+
+        producto1.setProveedor(proveedor);
+        producto2.setProveedor(null);
+        assertNotEquals(producto1, producto2);
+    }
 }

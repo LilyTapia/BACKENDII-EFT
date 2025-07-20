@@ -303,4 +303,122 @@ class JwtResponseTest {
         assertEquals(email, response.getEmail());
         assertEquals(roles, response.getRoles());
     }
+
+    @Test
+    void testEqualsWithNullFields() {
+        JwtResponse response1 = new JwtResponse();
+        JwtResponse response2 = new JwtResponse();
+
+        // Both null
+        assertEquals(response1, response2);
+
+        // One has token, other doesn't
+        response1.setToken("token1");
+        assertNotEquals(response1, response2);
+        assertNotEquals(response2, response1);
+
+        // Both have same token
+        response2.setToken("token1");
+        assertEquals(response1, response2);
+
+        // Different types (note: default type is "Bearer", so we need to set different values)
+        response1.setType("Basic");
+        assertNotEquals(response1, response2);
+
+        // Same types
+        response2.setType("Basic");
+        assertEquals(response1, response2);
+
+        // Different emails
+        response1.setEmail("test@example.com");
+        assertNotEquals(response1, response2);
+
+        // Same emails
+        response2.setEmail("test@example.com");
+        assertEquals(response1, response2);
+
+        // Different roles
+        List<String> roles1 = Arrays.asList("ROLE_USER");
+        response1.setRoles(roles1);
+        assertNotEquals(response1, response2);
+
+        // Same roles
+        response2.setRoles(roles1);
+        assertEquals(response1, response2);
+    }
+
+    @Test
+    void testHashCodeWithNullFields() {
+        JwtResponse response1 = new JwtResponse();
+        JwtResponse response2 = new JwtResponse();
+
+        // Both null - should have same hash
+        assertEquals(response1.hashCode(), response2.hashCode());
+
+        // Add fields one by one
+        response1.setToken("token1");
+        response2.setToken("token1");
+        assertEquals(response1.hashCode(), response2.hashCode());
+
+        response1.setType("Bearer");
+        response2.setType("Bearer");
+        assertEquals(response1.hashCode(), response2.hashCode());
+
+        response1.setEmail("test@example.com");
+        response2.setEmail("test@example.com");
+        assertEquals(response1.hashCode(), response2.hashCode());
+
+        List<String> roles1 = Arrays.asList("ROLE_USER");
+        response1.setRoles(roles1);
+        response2.setRoles(roles1);
+        assertEquals(response1.hashCode(), response2.hashCode());
+    }
+
+    @Test
+    void testEqualsEdgeCases() {
+        JwtResponse response1 = new JwtResponse("token1", "Bearer", "test@example.com", Arrays.asList("ROLE_USER"));
+
+        // Test with different types
+        assertNotEquals(response1, new Object());
+        assertNotEquals(response1, 123);
+        assertNotEquals(response1, "string");
+
+        // Test with null
+        assertNotEquals(response1, null);
+
+        // Test reflexivity
+        assertEquals(response1, response1);
+
+        // Test with different field values
+        JwtResponse responseDifferentToken = new JwtResponse("token2", "Bearer", "test@example.com", Arrays.asList("ROLE_USER"));
+        assertNotEquals(response1, responseDifferentToken);
+
+        JwtResponse responseDifferentType = new JwtResponse("token1", "Basic", "test@example.com", Arrays.asList("ROLE_USER"));
+        assertNotEquals(response1, responseDifferentType);
+
+        JwtResponse responseDifferentEmail = new JwtResponse("token1", "Bearer", "other@example.com", Arrays.asList("ROLE_USER"));
+        assertNotEquals(response1, responseDifferentEmail);
+
+        JwtResponse responseDifferentRoles = new JwtResponse("token1", "Bearer", "test@example.com", Arrays.asList("ROLE_ADMIN"));
+        assertNotEquals(response1, responseDifferentRoles);
+    }
+
+    @Test
+    void testHashCodeWithDifferentValues() {
+        JwtResponse response1 = new JwtResponse("token1", "Bearer", "test@example.com", Arrays.asList("ROLE_USER"));
+        JwtResponse response2 = new JwtResponse("token2", "Bearer", "test@example.com", Arrays.asList("ROLE_USER"));
+
+        // Different tokens should have different hash codes (most likely)
+        assertNotEquals(response1.hashCode(), response2.hashCode());
+    }
+
+    @Test
+    void testCanEqual() {
+        JwtResponse response1 = new JwtResponse();
+        JwtResponse response2 = new JwtResponse();
+
+        assertTrue(response1.canEqual(response2));
+        assertFalse(response1.canEqual("string"));
+        assertFalse(response1.canEqual(null));
+    }
 }
