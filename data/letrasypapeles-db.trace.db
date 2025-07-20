@@ -1,0 +1,17 @@
+2025-07-20 13:03:53.568583-04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "[*]INFORMATION_SCHEMA.USERS"; se esperaba "INSERT"
+Syntax error in SQL statement "[*]INFORMATION_SCHEMA.USERS"; expected "INSERT"; SQL statement:
+INFORMATION_SCHEMA.USERS [42001-224]
+2025-07-20 13:05:31.765367-04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CLIENTES" not found (this database is empty); SQL statement:
+SELECT * FROM CLIENTES [42104-224]
+2025-07-20 13:09:18.887760-04:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "CLIENTES" not found (this database is empty); SQL statement:
+SELECT * FROM CLIENTES [42104-224]
+2025-07-20 13:11:04.153398-04:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ROLES" not found (this database is empty); SQL statement:
+INSERT INTO roles (nombre) VALUES ('CLIENTE') [42104-224]
+2025-07-20 13:11:38.236487-04:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "ROLES" ya existe
+Table "ROLES" already exists; SQL statement:
+CREATE TABLE roles ( id BIGINT PRIMARY KEY AUTO_INCREMENT, nombre VARCHAR(50) UNIQUE ) [42101-224]
